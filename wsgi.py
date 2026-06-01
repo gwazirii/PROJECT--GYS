@@ -158,10 +158,17 @@ def trustee_login():
     if trustee_username == "GYS-BOT-77" and authentication_number == "Bauchi2026":
         session['user_name'] = "Board Trustee Member"
         session['role'] = 'trustee'
-        return redirect(url_for('home'))
+        return redirect(url_for('admin_dashboard'))  # <-- Points to the main dashboard now!
     
     flash('Access Denied: Invalid Username or Authentication Key.')
     return redirect(url_for('gate'))
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if session.get('role') != 'trustee':
+        return redirect(url_for('gate'))
+    all_citizens = Citizen.query.all()
+    return render_template('admin_dashboard.html', citizens=all_citizens)
 
 @app.route('/admin/approve/<int:citizen_id>')
 def approve_citizen(citizen_id):
