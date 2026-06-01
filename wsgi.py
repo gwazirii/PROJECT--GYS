@@ -78,6 +78,10 @@ def home():
         except Exception:
             all_citizens = []
             
+    # Change index.html to admin_dashboard.html right here:
+    if session.get('role') == 'trustee':
+        return render_template('admin_dashboard.html', citizens=all_citizens)
+        
     return render_template('index.html', citizens=all_citizens)
 
 @app.route('/register/tr', methods=['POST'])
