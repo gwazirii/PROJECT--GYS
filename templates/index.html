@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - GYS Hub</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f4; padding: 30px; margin: 0; }
+        nav { background: #2e4d2e; padding: 15px; color: white; display: flex; justify-content: space-between; }
+        nav a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; }
+        .container { background: white; padding: 30px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #28a745; color: white; }
+        .btn-approve { background: #28a745; color: white; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span>GYS Operational Environment | Active User: {{ session['user_name'] }} ({{ session['role'].upper() }})</span>
+        <div>
+            <a href="{{ url_for('home') }}">Data Grid</a>
+            <a href="{{ url_for('chat') }}">Strategy Terminal</a>
+            <a href="{{ url_for('history') }}">Logs</a>
+            <a href="{{ url_for('logout') }}" style="color:#ffc107;">Disconnect</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Campaign Registration Master Registry</h2>
+        {% if session['role'] == 'trustee' %}
+            <p>Welcome, Board Trustee Member. Below is the secure verification listing.</p>
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Details / PVC</th>
+                    <th>Clearance Status</th>
+                </tr>
+                {% for citizen in citizens %}
+                <tr>
+                    <td>{{ citizen.reg_type }}</td>
+                    <td>{{ citizen.full_name }}</td>
+                    <td>{{ citizen.email }}</td>
+                    <td>{{ citizen.phone }}</td>
+                    <td>
+                        {% if citizen.reg_type == 'TR_Citizen' %}
+                            Area: {{ citizen.area_name }}, House: {{ citizen.house_number }}
+                        {% else %}
+                            Ward: {{ citizen.ward }}, PVC: {{ citizen.pvc_number }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if citizen.approved %}
+                            <span style="color:green; font-weight:bold;">✓ Authorized</span>
+                        {% else %}
+                            <a class="btn-approve" href="{{ url_for('approve_citizen', citizen_id=citizen.id) }}">Authorize Profile</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p style="color: green; font-weight: bold;">Your profile status is clear. Welcome to the workspace dashboard gateway.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

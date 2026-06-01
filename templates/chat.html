@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Strategy Terminal</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f4; margin: 0; padding: 30px; }
+        nav { background: #2e4d2e; padding: 15px; color: white; display: flex; justify-content: space-between; }
+        nav a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; }
+        .chat-box { background: white; height: 400px; overflow-y: scroll; border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .msg { margin-bottom: 15px; padding: 10px; border-radius: 6px; background: #f1f1f1; }
+        .msg-trustee { background: #e8f5e9; border-left: 4px solid #28a745; }
+        form { display: flex; margin-top: 15px; }
+        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; }
+        button { background: #28a745; color: white; border: none; padding: 0 25px; border-radius: 0 4px 4px 0; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span>Secure Strategy Communication Room</span>
+        <div>
+            <a href="{{ url_for('home') }}">Data Grid</a>
+            <a href="{{ url_for('chat') }}">Strategy Terminal</a>
+            <a href="{{ url_for('history') }}">Logs</a>
+            <a href="{{ url_for('logout') }}">Disconnect</a>
+        </div>
+    </nav>
+
+    <div class="chat-box">
+        {% for msg in messages %}
+            <div class="msg {% if msg.sender_role == 'trustee' %}msg-trustee{% endif %}">
+                <strong>[{{ msg.timestamp.strftime('%H:%M:%S') }}] {{ msg.sender_name }} ({{ msg.sender_role.upper() }}):</strong>
+                <p style="margin: 5px 0 0 0;">{{ msg.message_text }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="POST">
+        <input type="text" name="message" placeholder="Type tactical message data..." autocomplete="off" required>
+        <button type="submit">Transmit</button>
+    </form>
+</body>
+</html>

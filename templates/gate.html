@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GYS Platform Operations Control</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f4; color: #2e4d2e; padding: 40px; text-align: center; }
+        .box { background: white; max-width: 450px; margin: 20px auto; padding: 30px; border-radius: 8px; border-top: 5px solid #28a745; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        input, select, textarea { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #28a745; color: white; border: none; padding: 12px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; width: 95%; }
+        .flash { color: #721c24; background: #f8d7da; padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h2>GYS Platform Operations Control</h2>
+    
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="box">
+        <h3>Campaign Verification Gateway</h3>
+        <form action="{{ url_for('citizen_login') }}" method="POST">
+            <input type="text" name="phone" placeholder="Registered Phone Number" required>
+            <input type="password" name="password" placeholder="Security Password" required>
+            <button type="submit">Verify & Access Dashboard</button>
+        </form>
+    </div>
+
+    <div class="box">
+        <h3>Board Trustee Access</h3>
+        <form action="{{ url_for('trustee_login') }}" method="POST">
+            <input type="text" name="trustee_username" placeholder="Trustee Username (GYS-BOT-XX)" required>
+            <input type="password" name="authentication_number" placeholder="Secure Authentication Key" required>
+            <button type="submit" style="background:#17a2b8;">Authenticate System</button>
+        </form>
+    </div>
+
+    <div class="box">
+        <h3>TR Citizen Profile Registry</h3>
+        <form action="{{ url_for('register_tr') }}" method="POST">
+            <input type="text" name="full_name" placeholder="Full Official Name" required>
+            <input type="text" name="area_name" placeholder="Area Name" required>
+            <input type="text" name="house_number" placeholder="House Number" required>
+            <input type="text" name="phone" placeholder="Phone Number" required>
+            <input type="email" name="email" placeholder="Email Address" required>
+            <input type="password" name="password" placeholder="Create Secure Password" required>
+            <button type="submit" style="background:#20c997;">Register TR Account</button>
+        </form>
+    </div>
+
+    <div class="box">
+        <h3>General Campaign Mobilization Form</h3>
+        <form action="{{ url_for('register_general') }}" method="POST">
+            <input type="text" name="full_name" placeholder="Full Name" required>
+            <textarea name="address" placeholder="Residential Address" required></textarea>
+            <input type="text" name="ward" placeholder="Voting Ward" required>
+            <input type="text" name="pvc_number" placeholder="PVC Identification Number" required>
+            <input type="text" name="phone" placeholder="Phone Number" required>
+            <input type="email" name="email" placeholder="Email Address" required>
+            <input type="password" name="password" placeholder="Create Secure Password" required>
+            <button type="submit" style="background:#ffc107; color:#333;">Submit Mobilization Profile</button>
+        </form>
+    </div>
+</body>
+</html>
