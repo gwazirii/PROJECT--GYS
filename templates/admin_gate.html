@@ -1,42 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Trustee Security Gate</title>
-    <style>
-        body { font-family: 'Courier New', monospace; background-color: #0d1b2a; color: #e0e1dd; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .vault-box { background: #1b263b; border: 2px solid #415a77; padding: 40px; border-radius: 8px; max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h2 { text-align: center; color: #70e000; margin-top: 0; letter-spacing: 2px; }
-        input { width: 100%; padding: 12px; margin: 12px 0; background: #0d1b2a; border: 1px solid #415a77; color: #fff; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
-        button { width: 100%; background: #38b000; color: white; padding: 12px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: inherit; font-size: 15px; }
-        button:hover { background: #007200; }
-        .flash { background: #3a0ca3; color: #fff; padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 15px; font-size: 13px; border: 1px solid #4cc9f0; }
-        .back-link { text-align: center; margin-top: 20px; }
-        .back-link a { color: #4cc9f0; text-decoration: none; font-size: 14px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYS Administrative Node Access</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <style>
+    body { background-color: #0b0c10; color: #c5c6c7; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .terminal-card { background-color: #1f2833; border: 2px solid #45a29e; box-shadow: 0 0 15px rgba(69, 162, 158, 0.5); border-radius: 8px; width: 100%; max-width: 420px; padding: 30px; }
+    .btn-auth { background-color: #45a29e; color: #0b0c10; font-weight: bold; border: none; }
+    .btn-auth:hover { background-color: #66fcf1; }
+    .text-neon { color: #66fcf1; }
+  </style>
 </head>
 <body>
-
-    <div class="vault-box">
-        <h2>TRUSTEE SECURE GATE</h2>
-        
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <div class="flash">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-
-        <form action="{{ url_for('trustee_login') }}" method="POST">
-            <input type="text" name="trustee_username" placeholder="Trustee Identifier" required>
-            <input type="password" name="authentication_number" placeholder="Cryptographic Access Key" required>
-            <button type="submit">Authenticate System</button>
-        </form>
-        <div class="back-link">
-            <a href="{{ url_for('gate') }}">← Return to Public Workspace</a>
-        </div>
+  <div class="terminal-card">
+    <div class="text-center mb-4">
+      <h4 class="text-neon fw-bold">BOARD TERMINAL GATE</h4>
+      <p class="text-muted small">Restricted administrative node clearance entry point.</p>
     </div>
+        
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-danger py-2 small border-0 bg-dark text-danger text-center">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
+    <form action="/trustee/login" method="POST">
+      <div class="mb-3">
+        <label class="form-label small text-uppercase fw-bold">Trustee Username ID</label>
+        <input type="text" name="trustee_username" class="form-control bg-dark text-white border-secondary" required autocomplete="off">
+      </div>
+      <div class="mb-3">
+        <label class="form-label small text-uppercase fw-bold">Authentication Number</label>
+        <input type="password" name="authentication_number" class="form-control bg-dark text-white border-secondary" required>
+      </div>
+      <button type="submit" class="btn btn-auth w-100 py-2 mt-2">AUTHENTICATE TERMINAL</button>
+    </form>
+  </div>
 </body>
 </html>

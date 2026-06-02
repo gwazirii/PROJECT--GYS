@@ -2,68 +2,169 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - GYS Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYS - Interactive Member Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background-color: #f4f7f4; padding: 30px; margin: 0; }
-        nav { background: #2e4d2e; padding: 15px; color: white; display: flex; justify-content: space-between; }
-        nav a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; }
-        .container { background: white; padding: 30px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #28a745; color: white; }
-        .btn-approve { background: #28a745; color: white; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 13px; }
+        body { background-color: #f4f7f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar-gys { background-color: #ffffff; border-bottom: 3px solid #2e7d32; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .nav-brand-text { font-weight: 800; color: #2e7d32; letter-spacing: 1px; }
+        .portal-header { background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; padding: 40px 0; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .card-custom { border: none; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background-color: white; height: 100%; }
+        .card-header-gys { background-color: #e8f5e9; border-bottom: 2px solid #a5d6a7; color: #1b5e20; font-weight: 700; border-top-left-radius: 10px; border-top-right-radius: 10px; }
+        .btn-gys { background-color: #2e7d32; color: white; font-weight: 600; transition: 0.3s; }
+        .btn-gys:hover { background-color: #1b5e20; color: white; }
+        .badge-trustee { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; font-weight: 700; }
+        .table-responsive { max-height: 500px; overflow-y: auto; }
     </style>
 </head>
 <body>
-    <nav>
-        <span>GYS Operational Environment | Active User: {{ session['user_name'] }} ({{ session['role'].upper() }})</span>
-        <div>
-            <a href="{{ url_for('home') }}">Data Grid</a>
-            <a href="{{ url_for('chat') }}">Strategy Terminal</a>
-            <a href="{{ url_for('history') }}">Logs</a>
-            <a href="{{ url_for('logout') }}" style="color:#ffc107;">Disconnect</a>
+
+    <nav class="navbar navbar-expand-lg navbar-gys sticky-top">
+        <div class="container">
+            <a class="navbar-brand nav-brand-text fs-3" href="#">GYS</a>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <span class="text-muted small d-none d-md-inline">Logged in as: <strong>{{ session.get('user_name') }}</strong></span>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm fw-bold px-3">Disconnect Account</a>
+            </div>
         </div>
     </nav>
 
-    <div class="container">
-        <h2>Campaign Registration Master Registry</h2>
-        {% if session['role'] == 'trustee' %}
-            <p>Welcome, Board Trustee Member. Below is the secure verification listing.</p>
-            <table>
-                <tr>
-                    <th>Type</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Details / PVC</th>
-                    <th>Clearance Status</th>
-                </tr>
-                {% for citizen in citizens %}
-                <tr>
-                    <td>{{ citizen.reg_type }}</td>
-                    <td>{{ citizen.full_name }}</td>
-                    <td>{{ citizen.email }}</td>
-                    <td>{{ citizen.phone }}</td>
-                    <td>
-                        {% if citizen.reg_type == 'TR_Citizen' %}
-                            Area: {{ citizen.area_name }}, House: {{ citizen.house_number }}
-                        {% else %}
-                            Ward: {{ citizen.ward }}, PVC: {{ citizen.pvc_number }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if citizen.approved %}
-                            <span style="color:green; font-weight:bold;">✓ Authorized</span>
-                        {% else %}
-                            <a class="btn-approve" href="{{ url_for('approve_citizen', citizen_id=citizen.id) }}">Authorize Profile</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p style="color: green; font-weight: bold;">Your profile status is clear. Welcome to the workspace dashboard gateway.</p>
-        {% endif %}
+    <div class="portal-header text-center">
+        <div class="container">
+            <h1 class="fw-bold display-5">GYS COMMUNITY MOBILIZATION PORTAL</h1>
+            <p class="lead opacity-75">Integrated infrastructure for regional growth mapping and security administration tracking.</p>
+        </div>
     </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info text-center shadow-sm border-start border-4 border-info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container mb-5">
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                <div class="card card-custom">
+                    <div class="card-header card-header-gys p-3 fs-5">
+                        <i class="fa-solid fa-tower-broadcast me-2"></i> Our Story & Streams
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div class="ratio ratio-16x9 mb-3 shadow-sm rounded overflow-hidden">
+                            <video controls class="bg-dark">
+                                <source src="{{ url_for('static', filename='videos/briefing.mp4') }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <p class="text-muted small">Watch our official streams & ward briefings regarding ongoing community development, infrastructure planning, and localized registration security mapping checks.</p>
+                        
+                        <div class="p-3 bg-light rounded border mt-2">
+                            <h6 class="fw-bold text-success mb-1"><i class="fa-solid fa-shield-halved"></i> Security Status</h6>
+                            <small class="text-muted">Verification Engine v2.4 (Active)<br>Regional Hub: Bauchi, Nigeria</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                
+                {% if session.get('role') == 'trustee' %}
+                <div class="card card-custom border-start border-4 border-warning">
+                    <div class="card-header p-3 fs-5 bg-warning bg-opacity-10 text-dark d-flex justify-content-between align-items-center fw-bold" style="border-bottom: 2px solid #ffc107;">
+                        <span><i class="fa-solid fa-users-gear text-warning me-2"></i> TRUSTEE MOBILIZATION HUB: ACCEPT PENDING MEMBERS</span>
+                        <span class="badge badge-trustee px-3 py-1 text-uppercase">Admin Overwatch</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted small mb-4">Below is the live operational stream of incoming registrations. As an authenticated Board Trustee, you can vet each applicant profile and click **Authorize User** to grant them instant access to the network.</p>
+                        
+                        <div class="table-responsive border rounded bg-white">
+                            <table class="table table-hover align-middle m-0">
+                                <thead class="table-light">
+                                    <tr class="small text-muted">
+                                        <th class="p-3">TRACK TYPE</th>
+                                        <th class="p-3">FULL NAME</th>
+                                        <th class="p-3">CONTACT LINE</th>
+                                        <th class="p-3">LOCATION CREDENTIALS</th>
+                                        <th class="p-3 text-center">STATUS</th>
+                                        <th class="p-3 text-end">ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for citizen in citizens %}
+                                        <tr>
+                                            <td class="p-3">
+                                                {% if citizen.reg_type == 'TR_Citizen' %}
+                                                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-2 py-1"><i class="fa-solid fa-house-chimney me-1"></i> GRA Resident</span>
+                                                {% else %}
+                                                    <span class="badge bg-info bg-opacity-10 text-info border border-info px-2 py-1"><i class="fa-solid fa-bullhorn me-1"></i> Mobilizer</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="p-3 fw-bold text-dark">{{ citizen.full_name }}</td>
+                                            <td class="p-3 text-monospace text-secondary">{{ citizen.phone }}</td>
+                                            <td class="p-3">
+                                                {% if citizen.reg_type == 'TR_Citizen' %}
+                                                    <span class="small">{{ citizen.area_name }} <span class="text-muted">(Hse: {{ citizen.house_number }})</span></span>
+                                                {% else %}
+                                                    <span class="small">Ward: {{ citizen.ward }} <br><span class="text-muted small">PVC: {{ citizen.pvc_number }}</span></span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="p-3 text-center">
+                                                {% if citizen.approved %}
+                                                    <span class="badge bg-success rounded-circle p-2" title="Authorized Access"><i class="fa-solid fa-check text-white"></i></span>
+                                                {% else %}
+                                                    <span class="badge bg-warning rounded-circle p-2 text-dark animate-pulse" title="Pending Review"><i class="fa-solid fa-clock"></i></span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="p-3 text-end">
+                                                {% if not citizen.approved %}
+                                                    <a href="{{ url_for('approve_citizen', citizen_id=citizen.id) }}" class="btn btn-sm btn-success fw-bold px-3 shadow-sm">
+                                                        Authorize User
+                                                    </a>
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-light text-muted border" disabled><i class="fa-solid fa-circle-check text-success me-1"></i> Ready</button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="6" class="text-center py-5 text-muted bg-light">
+                                                <i class="fa-solid fa-folder-open display-6 block mb-3 text-opacity-20 text-dark"></i><br>
+                                                <span class="fst-italic">No incoming registration profiles currently require evaluation triage.</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                {% else %}
+                <div class="card card-custom">
+                    <div class="card-header card-header-gys p-3 fs-5">
+                        <i class="fa-solid fa-newspaper me-2"></i> GYS Authorized Citizen Dashboard
+                    </div>
+                    <div class="card-body p-4 text-center py-5">
+                        <div class="mb-4 text-success"><i class="fa-solid fa-circle-check display-3"></i></div>
+                        <h3 class="fw-bold text-dark">Welcome, {{ session.get('user_name') }}!</h3>
+                        <p class="text-muted mx-auto" style="max-width: 500px;">Your secure profile credential mapping file is approved and fully verified. You now have full clearance across all standard GYS infrastructure channels.</p>
+                        <hr class="my-4 mx-auto w-50">
+                        <p class="small text-muted">Stay tuned for additional workspace utilities and upcoming forum releases scheduled by the Board of Trustees.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
