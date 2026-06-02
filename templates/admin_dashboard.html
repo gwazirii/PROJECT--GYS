@@ -2,88 +2,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GYS Master Control Terminal</title>
+    <title>GYS - Board Command Terminal</title>
     <style>
-        body { font-family: 'Courier New', monospace; background-color: #0d1b2a; color: #e0e1dd; margin: 0; padding: 20px; }
-        nav { background: #1b263b; padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid #415a77; }
-        nav a { color: #70e000; text-decoration: none; margin-left: 15px; font-weight: bold; }
-        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 20px; }
-        .card { background: #1b263b; border: 1px solid #415a77; padding: 20px; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        h2, h3 { color: #70e000; margin-top: 0; border-bottom: 1px solid #415a77; padding-bottom: 5px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #0d1b2a; }
-        th, td { border: 1px solid #415a77; padding: 10px; text-align: left; font-size: 14px; }
-        th { background-color: #415a77; color: #fff; }
-        .status-on { color: #70e000; font-weight: bold; }
-        .btn-action { background: #38b000; color: #fff; text-decoration: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; display: inline-block; }
-        .terminal-log { background: #000; border-left: 4px solid #38b000; padding: 15px; font-size: 13px; color: #38b000; height: 180px; overflow-y: auto; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 30px; background-color: #f1f5f9; color: #0f172a; }
+        .header { background: #0f172a; color: white; padding: 20px; border-radius: 8px; border-bottom: 4px solid #ffd700; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 20px; color: #ffd700; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+        th { background-color: #228b22; color: white; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+        .btn-exit { background-color: #ef4444; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; float: right; font-size: 13px; margin-top: -5px; }
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-pending { background-color: #fef08a; color: #854d0e; }
+        .status-active { background-color: #dcfce7; color: #166534; }
+        .btn-approve { background-color: #228b22; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .flash { background: #dcfce7; color: #166534; padding: 12px; border-radius: 6px; font-weight: bold; margin-bottom: 20px; font-size: 13px; border: 1px solid #bbf7d0;}
     </style>
 </head>
 <body>
-  <nav>
-        <span>⚡ GYS SYSTEM CORE MAIN DASHBOARD // ARCHITECTURE ACTIVE</span>
-        <div>
-            <a href="{{ url_for('home') }}">Core Terminal</a>
-            <a href="{{ url_for('chat') }}">Strategy Terminal</a>
-            <a href="{{ url_for('history') }}">System Logs</a>
-            <a href="{{ url_for('logout') }}" style="color:#d90429;">Kill Session</a>
-        </div>
-    </nav>
 
-    <div class="grid">
-        <div class="card">
-            <h2>System Controls</h2>
-            <p><strong>Operator:</strong> Executive Trustee</p>
-            <p><strong>Environment:</strong> Production-Cloud</p>
-            <p><strong>Database Status:</strong> <span class="status-on">ONLINE (SQLite)</span></p>
-            <hr style="border-color: #415a77;">
-            <h3>Live Activity Stream</h3>
-            <div class="terminal-log">
-                [SYSTEM OK] Core routing initialized...<br>
-                [SECURITY] Gatekeeper module active...<br>
-                [DATABASE] gys_registry.db mapping successful...<br>
-                [SESSION] Executive Trustee Authenticated via key...<br>
-                >> Terminal interface deployment stable.
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Campaign Registration Master Registry</h2>
-            <p>Manage and verify mobilizing users within the local data stream network.</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Full Name</th>
-                        <th>Phone Link</th>
-                        <th>Details / PVC Data</th>
-                        <th>Clearance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for citizen in citizens %}
-                    <tr>
-                        <td><span style="color:#a3b18a;">{{ citizen.reg_type }}</span></td>
-                        <td><strong>{{ citizen.full_name }}</strong></td>
-                        <td>{{ citizen.phone }}</td>
-                        <td>
-                            {% if citizen.reg_type == 'TR_Citizen' %}
-                                Area: {{ citizen.area_name }}, H#: {{ citizen.house_number }}
-                            {% else %}
-                                Ward: {{ citizen.ward }}, PVC: {{ citizen.pvc_number }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if citizen.approved %}
-                                <span class="status-on">✓ Authorized</span>
-                            {% else %}
-                                <a class="btn-action" href="{{ url_for('approve_citizen', citizen_id=citizen.id) }}">Authorize</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="header">
+        <a href="/logout" class="btn-exit">Close Terminal</a>
+        <h1>🛡️ GYS Board Command Central</h1>
+        <p style="margin: 5px 0 0 0; font-size: 13px; color: #94a3b8;">Official secure database registry mapping confirmed residents.</p>
     </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <h2>Registered Citizen Database File ({{ citizens|length }} Total)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Record ID</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Phone Number</th>
+                <th>Ward Location</th>
+                <th>PVC Number</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for citizen in citizens %}
+            <tr>
+                <td><strong>#00{{ citizen.id }}</strong></td>
+                <td>{{ citizen.full_name }}</td>
+                <td>{{ citizen.email }}</td>
+                <td>{{ citizen.phone }}</td>
+                <td>
+                    {% if citizen.reg_type == 'TR_Citizen' %}
+                        {{ citizen.area_name }}
+                    {% else %}
+                        {{ citizen.ward }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if citizen.pvc_number %}
+                        <code>{{ citizen.pvc_number }}</code>
+                    {% else %}
+                        <span style="color: #94a3b8; font-style: italic;">TR Resident (No PVC)</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if citizen.approved %}
+                        <span class="status-badge status-active">Active</span>
+                    {% else %}
+                        <span class="status-badge status-pending">Pending Approval</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not citizen.approved %}
+                        <a href="/admin/approve/{{ citizen.id }}" class="btn-approve">Approve Profile</a>
+                    {% else %}
+                        <span style="color: #94a3b8; font-size: 11px;">Validated Verified</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" style="text-align: center; color: #64748b; padding: 30px;">No records mapped in the registry database yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
 </body>
 </html>
