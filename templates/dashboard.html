@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GYS Master Control Terminal</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #0d1b2a; color: #e0e1dd; margin: 0; padding: 20px; }
+        nav { background: #1b263b; padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid #415a77; align-items: center; }
+        nav a { color: #70e000; text-decoration: none; margin-left: 15px; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 20px; }
+        .card { background: #1b263b; border: 1px solid #415a77; padding: 20px; border-radius: 6px; }
+        h2, h3 { color: #70e000; margin-top: 0; border-bottom: 1px solid #415a77; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #0d1b2a; }
+        th, td { border: 1px solid #415a77; padding: 10px; text-align: left; font-size: 14px; }
+        th { background-color: #415a77; color: #fff; }
+        .status-on { color: #70e000; font-weight: bold; }
+        .btn-action { background: #38b000; color: #fff; text-decoration: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; display: inline-block; }
+        .terminal-log { background: #000; border-left: 4px solid #38b000; padding: 15px; font-size: 13px; color: #38b000; height: 180px; overflow-y: auto; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <span>⚡ GYS SYSTEM CORE MAIN DASHBOARD // ARCHITECTURE ACTIVE</span>
+        <div>
+            <a href="{{ url_for('home') }}">Core Terminal</a>
+            <a href="{{ url_for('chat') }}">Strategy Terminal</a>
+            <a href="{{ url_for('history') }}">System Logs</a>
+            <a href="{{ url_for('logout') }}" style="color:#d90429;">Kill Session</a>
+        </div>
+    </nav>
+
+    <div class="grid">
+        <div class="card">
+            <h2>System Controls</h2>
+            <p><strong>Operator:</strong> Executive Trustee</p>
+            <p><strong>Environment:</strong> Production-Cloud</p>
+            <p><strong>Database Status:</strong> <span class="status-on">ONLINE (SQLite)</span></p>
+            <hr style="border-color: #415a77;">
+            <h3>Live Activity Stream</h3>
+            <div class="terminal-log">
+                [SYSTEM OK] Core routing initialized...<br>
+                [SECURITY] Gatekeeper module active...<br>
+                [DATABASE] gys_registry.db mapping successful...<br>
+                [SESSION] Executive Trustee Authenticated via key...<br>
+                >> Terminal interface deployment stable.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Campaign Registration Master Registry</h2>
+            <p>Manage and verify mobilizing users within the local data stream network.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Full Name</th>
+                        <th>Phone Link</th>
+                        <th>Details / PVC Data</th>
+                        <th>Clearance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for citizen in citizens %}
+                    <tr>
+                        <td><span style="color:#a3b18a;">{{ citizen.reg_type }}</span></td>
+                        <td><strong>{{ citizen.full_name }}</strong></td>
+                        <td>{{ citizen.phone }}</td>
+                        <td>
+                            {% if citizen.reg_type == 'TR_Citizen' %}
+                                Area: {{ citizen.area_name }}, H#: {{ citizen.house_number }}
+                            {% else %}
+                                Ward: {{ citizen.ward }}, VIN: {{ citizen.pvc_number }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if citizen.approved %}
+                                <span class="status-on">✓ Authorized</span>
+                            {% else %}
+                                <a class="btn-action" href="{{ url_for('approve_citizen', citizen_id=citizen.id) }}">Authorize</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #888;">No database registration records found in local segment.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

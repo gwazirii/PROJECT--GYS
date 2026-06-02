@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trustee Security Gate</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background-color: #0d1b2a; color: #e0e1dd; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .vault-box { background: #1b263b; border: 2px solid #415a77; padding: 40px; border-radius: 8px; max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #70e000; margin-top: 0; letter-spacing: 2px; }
+        input { width: 100%; padding: 12px; margin: 12px 0; background: #0d1b2a; border: 1px solid #415a77; color: #fff; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        button { width: 100%; background: #38b000; color: white; padding: 12px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-family: inherit; font-size: 15px; }
+        button:hover { background: #007200; }
+        .flash { background: #3a0ca3; color: #fff; padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 15px; font-size: 13px; border: 1px solid #4cc9f0; }
+        .back-link { text-align: center; margin-top: 20px; }
+        .back-link a { color: #4cc9f0; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="vault-box">
+        <h2>TRUSTEE SECURE GATE</h2>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="flash">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('trustee_login') }}" method="POST">
+            <input type="text" name="trustee_username" placeholder="Trustee Identifier" required>
+            <input type="password" name="authentication_number" placeholder="Cryptographic Access Key" required>
+            <button type="submit">Authenticate System</button>
+        </form>
+        <div class="back-link">
+            <a href="{{ url_for('gate') }}">← Return to Public Workspace</a>
+        </div>
+    </div>
+
+</body>
+</html>
