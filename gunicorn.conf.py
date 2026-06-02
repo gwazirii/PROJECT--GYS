@@ -1,8 +1,11 @@
 # gunicorn.conf.py
 import multiprocessing
+import os
 
 # --- Network Socket Binding ---
-bind = "0.0.0.0:10000"
+# Use the PORT provided by the hosting environment (e.g. Render uses $PORT)
+port = os.environ.get('PORT', '10000')
+bind = f"0.0.0.0:{port}"
 
 # --- Process Concurrency Tuning ---
 # Automatically scales worker count based on the assigned CPU core allocation formula (2 * Cores + 1)
