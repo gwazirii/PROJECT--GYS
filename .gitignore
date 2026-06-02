@@ -1,21 +1,56 @@
-# Python cache files
+# --- User Specific Track Files ---
+members.txt
+field_reports.txt
+
+# --- Local Databases & Sensitive Assets ---
+*.db
+*.sqlite
+*.sqlite3
+gys_registry.db
+instance/
+.env
+.env.*
+
+# --- Python Byte-compiled / Cache ---
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 
-# SQLite database files
-*.db
-*.sqlite
-
-# Virtual environments
-venv/
-.env/
+# --- Virtual environments ---
 .venv/
+venv/
+ENV/
+env/
 
-# Environment variables
-.env
+# --- IDE / Editor ---
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
 
-# Editor files
-*.swp
-*.swo
+# --- Build / Packaging ---
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+*.egg
+
+# --- Testing / Coverage ---
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# --- Logs ---
+*.log
+
+# --- OS files ---
 .DS_Store
+Thumbs.db
+
+# --- Misc ---
+.mypy_cache/
+*.whl
