@@ -6,15 +6,18 @@ from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'gys_secure_system_key_2026'
+app.secret_key = os.environ.get('SECRET_KEY', 'gys_secure_system_key_2026')
 
 # --- EMAIL CONFIGURATION ---
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_organization_email@gmail.com'
-app.config['MAIL_PASSWORD'] = 'your_gmail_app_password'
-app.config['MAIL_DEFAULT_SENDER'] = ('GYS Platform', 'your_organization_email@gmail.com')
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', '587'))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() in ('1', 'true', 'yes')
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = (
+    os.environ.get('MAIL_SENDER_NAME', 'GYS Platform'),
+    os.environ.get('MAIL_SENDER_EMAIL', os.environ.get('MAIL_USERNAME', 'no-reply@example.com'))
+)
 mail = Mail(app)
 
 # --- DATABASE CONFIGURATION ---
