@@ -5,17 +5,16 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 
-application = Flask(__name__)
-app = application
+app = Flask(__name__)
 app.secret_key = 'gys_secure_system_key_2026'
 
 # --- EMAIL CONFIGURATION ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'grayouthsupporters@gmail.com'
-app.config['MAIL_PASSWORD'] = '001122GRA'
-app.config['MAIL_DEFAULT_SENDER'] = ('GYS Platform', 'grayouthsupporters@gmail.com')
+app.config['MAIL_USERNAME'] = 'your_organization_email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your_gmail_app_password'
+app.config['MAIL_DEFAULT_SENDER'] = ('GYS Platform', 'your_organization_email@gmail.com')
 mail = Mail(app)
 
 # --- DATABASE CONFIGURATION ---
@@ -24,19 +23,21 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'g
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Comprehensive Database Models
+# Comprehensive Database Model for All Registrants
 class Citizen(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    reg_type = db.Column(db.String(50), nullable=False) 
+    reg_type = db.Column(db.String(50), nullable=False) # 'TR_Citizen' or 'General_Mobilization'
     full_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     approved = db.Column(db.Boolean, default=False)
     
+    # TR Specific Fields
     area_name = db.Column(db.String(100), nullable=True)
     house_number = db.Column(db.String(50), nullable=True)
     
+    # Campaign Mobilization Fields
     ward = db.Column(db.String(100), nullable=True)
     pvc_number = db.Column(db.String(50), unique=True, nullable=True)
     address = db.Column(db.Text, nullable=True)
@@ -70,20 +71,9 @@ def home():
         flash('Your registration profile is currently pending review. Access will be authorized once a Trustee verifies your credentials.')
         session.clear()
         return redirect(url_for('gate'))
-        
-    all_citizens = []
-    if session.get('role') == 'trustee':
-        try:
-            all_citizens = Citizen.query.all()
-        except Exception:
-            all_citizens = []
-            
-    # Change index.html to admin_dashboard.html right here:
-    if session.get('role') == 'trustee':
-        return render_template('admin_dashboard.html', citizens=all_citizens)
-        
-    return render_template('index.html', citizens=all_citizens)
+    return render_template('index.html')
 
+# 1. TR CITIZEN REGISTRATION ROUTE
 @app.route('/register/tr', methods=['POST'])
 def register_tr():
     full_name = request.form.get('full_name')
@@ -94,7 +84,7 @@ def register_tr():
     password = request.form.get('password')
 
     if Citizen.query.filter((Citizen.phone == phone) | (Citizen.email == email)).first():
-        flash('Registration Error: Phone number or Email already exists.')
+        flash('Registration Error: Phone number or Email already exists inside the GYS system.')
         return redirect(url_for('gate'))
 
     hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
@@ -109,6 +99,7 @@ def register_tr():
     flash('Profile Saved! Your TR Citizen account is pending executive validation.')
     return redirect(url_for('gate'))
 
+# 2. GENERAL CAMPAIGN MOBILIZATION ROUTE (REQUIRES PVC)
 @app.route('/register/general', methods=['POST'])
 def register_general():
     full_name = request.form.get('full_name')
@@ -120,7 +111,7 @@ def register_general():
     password = request.form.get('password')
 
     if Citizen.query.filter((Citizen.phone == phone) | (Citizen.email == email) | (Citizen.pvc_number == pvc_number)).first():
-        flash('Registration Error: Phone, Email, or PVC Number already exists.')
+        flash('Registration Error: Phone, Email, or PVC Number already exists inside our mobilization directory.')
         return redirect(url_for('gate'))
 
     hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
@@ -135,6 +126,7 @@ def register_general():
     flash('Campaign Profile Registered! Access pending verification.')
     return redirect(url_for('gate'))
 
+# LOGIN & TERMINAL OPERATIONS
 @app.route('/citizen/login', methods=['POST'])
 def citizen_login():
     phone = request.form.get('phone')
@@ -162,17 +154,17 @@ def trustee_login():
     if trustee_username == "GYS-BOT-77" and authentication_number == "Bauchi2026":
         session['user_name'] = "Board Trustee Member"
         session['role'] = 'trustee'
-        return redirect(url_for('admin_dashboard'))  # <-- Points to the main dashboard now!
+        return redirect(url_for('dashboard'))
     
     flash('Access Denied: Invalid Username or Authentication Key.')
     return redirect(url_for('gate'))
 
-@app.route('/admin/dashboard')
-def admin_dashboard():
+@app.route('/dashboard')
+def dashboard():
     if session.get('role') != 'trustee':
         return redirect(url_for('gate'))
     all_citizens = Citizen.query.all()
-    return render_template('admin_dashboard.html', citizens=all_citizens)
+    return render_template('dashboard.html', citizens=all_citizens)
 
 @app.route('/admin/approve/<int:citizen_id>')
 def approve_citizen(citizen_id):
@@ -182,7 +174,7 @@ def approve_citizen(citizen_id):
     citizen.approved = True
     db.session.commit()
     flash(f"Profile for {citizen.full_name} has been activated.")
-    return redirect(url_for('home'))
+    return redirect(url_for('dashboard'))
 
 @app.route('/chat', methods=['GET', 'POST'])
 def chat():
