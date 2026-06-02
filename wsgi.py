@@ -49,8 +49,20 @@ class ChatMessage(db.Model):
     message_text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+class LogEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_type = db.Column(db.String(60), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
 with app.app_context():
     db.create_all()
+
+
+def record_log(event_type, message):
+    log = LogEvent(event_type=event_type, message=message)
+    db.session.add(log)
+    db.session.commit()
 
 # --- SECURITY GATEKEEPER MIDDLEWARE ---
 @app.before_request
@@ -68,7 +80,7 @@ def gate():
 @app.route('/')
 def home():
     if session.get('role') == 'citizen' and not session.get('approved'):
-        flash('Your registration profile is currently pending review. Access will be authorized once a Trustee verifies your credentials.')
+        flash('Waiting for Trustee authorization clearance.')
         session.clear()
         return redirect(url_for('gate'))
     return render_template('index.html')
@@ -95,6 +107,7 @@ def register_tr():
     )
     db.session.add(new_tr)
     db.session.commit()
+    record_log('registration', f'New TR registration submitted for {full_name} ({phone}).')
     
     flash('Profile Saved! Your TR Citizen account is pending executive validation.')
     return redirect(url_for('gate'))
@@ -103,25 +116,26 @@ def register_tr():
 @app.route('/register/general', methods=['POST'])
 def register_general():
     full_name = request.form.get('full_name')
-    address = request.form.get('address')
     ward = request.form.get('ward')
     pvc_number = request.form.get('pvc_number')
     phone = request.form.get('phone')
     email = request.form.get('email')
     password = request.form.get('password')
 
+    # The PVC registry intentionally tracks only voting ward and PVC VIN identifiers.
     if Citizen.query.filter((Citizen.phone == phone) | (Citizen.email == email) | (Citizen.pvc_number == pvc_number)).first():
         flash('Registration Error: Phone, Email, or PVC Number already exists inside our mobilization directory.')
         return redirect(url_for('gate'))
 
     hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
     new_general = Citizen(
-        reg_type='General_Mobilization', full_name=full_name, address=address,
+        reg_type='General_Mobilization', full_name=full_name,
         ward=ward, pvc_number=pvc_number, phone=phone, email=email,
         password=hashed_password, approved=False
     )
     db.session.add(new_general)
     db.session.commit()
+    record_log('registration', f'New PVC registration submitted for {full_name} ({phone}).')
 
     flash('Campaign Profile Registered! Access pending verification.')
     return redirect(url_for('gate'))
@@ -135,12 +149,14 @@ def citizen_login():
     user = Citizen.query.filter_by(phone=phone).first()
     if user and check_password_hash(user.password, password):
         if not user.approved:
-            flash('Access Blocked: Your profile verification is still pending.')
+            flash('Waiting for Trustee authorization clearance.')
+            record_log('access_blocked', f'Pending clearance login blocked for {user.full_name} ({phone}).')
             return redirect(url_for('gate'))
-            
+
         session['user_name'] = user.full_name
         session['role'] = 'citizen'
         session['approved'] = True
+        record_log('login', f'Citizen {user.full_name} ({phone}) logged in.')
         return redirect(url_for('home'))
     
     flash('Invalid verification credentials.')
@@ -154,9 +170,11 @@ def trustee_login():
     if trustee_username == "GYS-BOT-77" and authentication_number == "Bauchi2026":
         session['user_name'] = "Board Trustee Member"
         session['role'] = 'trustee'
+        record_log('trustee_login', 'Board Trustee authenticated and entered the dashboard.')
         return redirect(url_for('dashboard'))
     
     flash('Access Denied: Invalid Username or Authentication Key.')
+    record_log('access_denied', f'Failed trustee login attempt for {trustee_username}.')
     return redirect(url_for('gate'))
 
 @app.route('/dashboard')
@@ -173,6 +191,7 @@ def approve_citizen(citizen_id):
     citizen = Citizen.query.get_or_404(citizen_id)
     citizen.approved = True
     db.session.commit()
+    record_log('approval', f'Trustee approved profile for {citizen.full_name} ({citizen.phone}).')
     flash(f"Profile for {citizen.full_name} has been activated.")
     return redirect(url_for('dashboard'))
 
@@ -186,16 +205,22 @@ def chat():
             new_msg = ChatMessage(sender_name=session.get('user_name'), sender_role=session.get('role'), message_text=msg_content.strip())
             db.session.add(new_msg)
             db.session.commit()
+            record_log('chat', f'{session.get("user_name")} ({session.get("role")}) posted a message.')
             return redirect(url_for('chat'))
     messages = ChatMessage.query.order_by(ChatMessage.timestamp.asc()).all()
     return render_template('chat.html', messages=messages)
 
 @app.route('/history')
 def history():
-    return render_template('history.html')
+    logs = LogEvent.query.order_by(LogEvent.timestamp.desc()).limit(100).all()
+    return render_template('history.html', logs=logs)
 
 @app.route('/logout')
 def logout():
+    user_name = session.get('user_name')
+    role = session.get('role')
+    if user_name:
+        record_log('logout', f'{user_name} ({role}) signed out.')
     session.clear()
     return redirect(url_for('gate'))
 

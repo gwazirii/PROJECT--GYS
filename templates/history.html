@@ -23,6 +23,28 @@
     <div class="container">
         <h2>Historical Context Records</h2>
         <p>Operational data structures and timeline history are archived and verified under secure Board management parameters.</p>
+        <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th style="border:1px solid #ddd; padding: 10px; background:#2e4d2e; color:white; text-align:left;">Time</th>
+                    <th style="border:1px solid #ddd; padding: 10px; background:#2e4d2e; color:white; text-align:left;">Event</th>
+                    <th style="border:1px solid #ddd; padding: 10px; background:#2e4d2e; color:white; text-align:left;">Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td style="border:1px solid #ddd; padding: 10px;">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td style="border:1px solid #ddd; padding: 10px;">{{ log.event_type }}</td>
+                    <td style="border:1px solid #ddd; padding: 10px;">{{ log.message }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="border:1px solid #ddd; padding: 20px; text-align:center; color:#64748b;">No event history exists yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>

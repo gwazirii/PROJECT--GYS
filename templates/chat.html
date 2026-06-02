@@ -27,7 +27,11 @@
 
         <div class="window">
             {% for msg in messages %}
-                <div class="msg">{{ msg }}</div>
+                <div class="msg">
+                    <strong>{{ msg.sender_name }} ({{ msg.sender_role }})</strong>
+                    <span style="float:right; color:#555; font-size:12px;">{{ msg.timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+                    <div style="margin-top:6px; color:#0f172a;">{{ msg.message_text }}</div>
+                </div>
             {% else %}
                 <div style="color:#888; text-align:center; margin-top:100px;">Communications timeline clear. Send a message below.</div>
             {% endfor %}
