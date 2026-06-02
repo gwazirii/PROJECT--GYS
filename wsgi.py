@@ -67,7 +67,7 @@ def record_log(event_type, message):
 # --- SECURITY GATEKEEPER MIDDLEWARE ---
 @app.before_request
 def check_security_clearance():
-    allowed_routes = ['gate', 'register_tr', 'register_general', 'citizen_login', 'trustee_login', 'static']
+    allowed_routes = ['gate', 'admin_gate', 'register_tr', 'register_general', 'citizen_login', 'trustee_login', 'static']
     if request.endpoint not in allowed_routes and 'user_name' not in session:
         return redirect(url_for('gate'))
 
@@ -76,6 +76,12 @@ def gate():
     if 'user_name' in session:
         return redirect(url_for('home'))
     return render_template('gate.html')
+
+@app.route('/admin/gate')
+def admin_gate():
+    if 'user_name' in session:
+        return redirect(url_for('home'))
+    return render_template('admin_gate.html')
 
 @app.route('/')
 def home():
@@ -128,10 +134,12 @@ def register_general():
         return redirect(url_for('gate'))
 
     hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+    address = request.form.get('address')
     new_general = Citizen(
         reg_type='General_Mobilization', full_name=full_name,
-        ward=ward, pvc_number=pvc_number, phone=phone, email=email,
-        password=hashed_password, approved=False
+        ward=ward, pvc_number=pvc_number, address=address,
+        phone=phone, email=email, password=hashed_password,
+        approved=False
     )
     db.session.add(new_general)
     db.session.commit()
@@ -182,7 +190,7 @@ def dashboard():
     if session.get('role') != 'trustee':
         return redirect(url_for('gate'))
     all_citizens = Citizen.query.all()
-    return render_template('dashboard.html', citizens=all_citizens)
+    return render_template('admin_dashboard.html', citizens=all_citizens)
 
 @app.route('/admin/approve/<int:citizen_id>')
 def approve_citizen(citizen_id):
