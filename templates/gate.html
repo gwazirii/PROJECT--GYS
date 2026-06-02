@@ -38,51 +38,51 @@
 
         <div class="grid">
             <div class="box">
-                <h3>TR Resident Secure Registry</h3>
-                <p>Exclusive portal for core TR area residents. Requires administration validation check.</p>
+                <h3>GRA Resident Secure Registry</h3>
+                <p>Exclusive portal for core GRA area residents. Create account to register.</p>
                 <form action="/register/tr" method="POST">
                     <input type="text" name="full_name" placeholder="Full Name" class="input-field" required>
                     <input type="text" name="area_name" placeholder="Your Area Name" class="input-field" required>
                     <input type="text" name="house_number" placeholder="House Number" class="input-field" required>
-                    <input type="tel" name="phone" placeholder="Phone Line Contact" class="input-field" required>
                     <input type="email" name="email" placeholder="Email Address" class="input-field" required>
-                    <input type="password" name="password" placeholder="Establish Secret Password" class="input-field" required>
-                    <button type="submit" class="btn btn-green">Submit Registry File</button>
+                    <input type="tel" name="phone" placeholder="Phone Number" class="input-field" required>
+                    <input type="password" name="password" placeholder="Create Access Password" class="input-field" required>
+                    <button type="submit" class="btn btn-green">Create Account</button>
                 </form>
             </div>
 
             <div class="box" style="border-color: #3b82f6;">
                 <h3 style="color: #60a5fa;">General Campaign Mobilization</h3>
-                <p>Public campaign registry framework. PVC documentation strictly required for field mobilization ops.</p>
+                <p>Public campaign registry framework. Create account with PVC documentation.</p>
                 <form action="/register/general" method="POST">
                     <input type="text" name="full_name" placeholder="Full Name" class="input-field" required>
-                    <input type="text" name="ward" placeholder="Voting Ward" class="input-field" required>
-                    <input type="text" name="pvc_number" placeholder="PVC VIN Identification Number" class="input-field" required>
-                    <input type="text" name="address" placeholder="Residential Address / Deployment Zone" class="input-field" required>
-                    <input type="tel" name="phone" placeholder="Phone Number" class="input-field" required>
+                    <input type="text" name="ward" placeholder="Ward Name" class="input-field" required>
+                    <input type="text" name="pvc_number" placeholder="PVC Number" class="input-field" required>
+                    <input type="text" name="address" placeholder="Address" class="input-field" required>
                     <input type="email" name="email" placeholder="Email Address" class="input-field" required>
+                    <input type="tel" name="phone" placeholder="Phone Number" class="input-field" required>
                     <input type="password" name="password" placeholder="Create Access Password" class="input-field" required>
-                    <button type="submit" class="btn btn-gray" style="background-color: #2563eb;">Join Mobilization Stream</button>
+                    <button type="submit" class="btn btn-green">Create Account</button>
                 </form>
             </div>
 
             <div class="box">
                 <h3>Account Portal Access</h3>
-                <p>Authorized login node for successfully verified residents and team members.</p>
+                <p>Login node for verified residents and team members.</p>
                 <form action="/citizen/login" method="POST">
-                    <input type="tel" name="phone" placeholder="Registered Phone Line" class="input-field" required>
+                    <input type="tel" name="phone" placeholder="Phone Number" class="input-field" required>
                     <input type="password" name="password" placeholder="Security Password" class="input-field" required>
-                    <button type="submit" class="btn btn-gray">Verify Identity & Enter</button>
+                    <button type="submit" class="btn btn-gray">Login</button>
                 </form>
             </div>
 
             <div class="box admin">
                 <h3>Board Terminal Gate</h3>
-                <p>Restricted administrative operations terminal access point. Encryption clearance mandatory.</p>
+                <p>Full access to GYS Dashboard and GYS Board Command Central.</p>
                 <form action="/trustee/login" method="POST">
-                    <input type="text" name="trustee_username" placeholder="Trustee Username ID" class="input-field" style="border-color: #ffd700;" required>
+                    <input type="text" name="trustee_username" placeholder="Trustee Username" class="input-field" style="border-color: #ffd700;" required>
                     <input type="password" name="authentication_number" placeholder="Authentication Number" class="input-field" style="border-color: #ffd700;" required>
-                    <button type="submit" class="btn btn-gold">Authenticate Terminal</button>
+                    <button type="submit" class="btn btn-gold">Access Dashboard</button>
                 </form>
             </div>
         </div>
