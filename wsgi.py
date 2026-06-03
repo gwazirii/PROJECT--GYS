@@ -12,6 +12,7 @@ load_dotenv()
 # 2. Application setup (supports Render)
 application = Flask(__name__)
 app = application  # Dual alias mapping for local vs Render configurations
+os.makedirs(app.instance_path, exist_ok=True)
 
 # 3. Assign configurations
 app.secret_key = os.getenv('SECRET_KEY', 'gys_secure_system_key_2026')

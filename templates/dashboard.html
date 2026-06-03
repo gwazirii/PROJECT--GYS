@@ -22,13 +22,13 @@
 
     <div class="header">
         <a href="/logout" class="btn-exit">Close Terminal</a>
-        <h1>🛡️ GYS Board Command Central</h1>
+        <h1>GYS Board Command Central</h1>
         <p style="margin: 5px 0 0 0; font-size: 13px; color: #94a3b8;">Official secure database registry mapping confirmed residents.</p>
     </div>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="flash">✅ {{ messages[0] }}</div>
+        <div class="flash">Success: {{ messages[0] }}</div>
       {% endif %}
     {% endwith %}
 

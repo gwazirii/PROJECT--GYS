@@ -35,7 +35,7 @@
 
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid px-4">
-            <a class="navbar-brand" href="#">🛡️ GYS PORTAL SYSTEM</a>
+            <a class="navbar-brand" href="#">GYS PORTAL SYSTEM</a>
             <div class="ms-auto navbar-nav">
                 <span class="text-secondary small font-monospace">Network Status: SECURE ONLINE</span>
             </div>
@@ -45,7 +45,7 @@
     <div class="container main-container">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div class="flash-alert shadow-sm">⚠️ {{ messages[0] }}</div>
+                <div class="flash-alert shadow-sm">System Alert: {{ messages[0] }}</div>
             {% endif %}
         {% endwith %}
 
@@ -53,7 +53,7 @@
             
             <div class="col-md-4">
                 <div class="org-sidebar">
-                    <img src="/static/logo.png" alt="GYS Official Logo" class="side-logo img-fluid" onerror="this.style.display='none'">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="GYS Official Logo" class="side-logo img-fluid" onerror="this.style.display='none'">
                     <h5 class="text-center fw-bold mb-3" style="font-size: 15px;">GRA Youth Supporters</h5>
                     
                     <h4 class="section-heading">Aim & Objective</h4>
@@ -79,8 +79,8 @@
                 <h3 class="col-title">Citizen Access Portal</h3>
                 
                 <div class="nav-tabs-custom">
-                    <button id="btn-tab-login" class="active" onclick="toggleCenterTab('login')">🔑 LOG IN</button>
-                    <button id="btn-tab-register" onclick="toggleCenterTab('register')">📝 CREATE ACCOUNT</button>
+                    <button id="btn-tab-login" class="active" onclick="toggleCenterTab('login')">LOG IN</button>
+                    <button id="btn-tab-register" onclick="toggleCenterTab('register')">CREATE ACCOUNT</button>
                 </div>
 
                 <div id="panel-login">
@@ -90,7 +90,7 @@
                         <input type="tel" name="phone" class="form-control form-control-sm" placeholder="e.g. 08030000000" required>
                         
                         <label class="small fw-bold text-secondary mb-1">Security Password</label>
-                        <input type="password" name="password" class="form-control form-control-sm" placeholder="••••••••" required>
+                        <input type="password" name="password" class="form-control form-control-sm" placeholder="Password" required>
                         
                         <button type="submit" class="btn-gys mt-2">Access Account Ledger</button>
                     </form>
@@ -106,6 +106,7 @@
                         <form action="/register/tr" method="POST">
                             <input type="text" name="full_name" class="form-control form-control-sm" placeholder="Full Name" required>
                             <input type="tel" name="phone" class="form-control form-control-sm" placeholder="Phone Contact" required>
+                            <input type="email" name="email" class="form-control form-control-sm" placeholder="Email Address">
                             <input type="text" name="ward" class="form-control form-control-sm" placeholder="Area Location (e.g. GRA Bauchi)" required>
                             <input type="password" name="password" class="form-control form-control-sm" placeholder="Security Password" required>
                             <button type="submit" class="btn-gys">Submit GRA Registry File</button>
@@ -116,6 +117,7 @@
                         <form action="/register/general" method="POST">
                             <input type="text" name="full_name" class="form-control form-control-sm" placeholder="Full Name" required>
                             <input type="tel" name="phone" class="form-control form-control-sm" placeholder="Phone Contact" required>
+                            <input type="email" name="email" class="form-control form-control-sm" placeholder="Email Address">
                             <input type="text" name="ward" class="form-control form-control-sm" placeholder="Electoral Ward Location" required>
                             <input type="text" name="pvc_number" class="form-control form-control-sm" placeholder="PVC Number (VIN String)" required>
                             <input type="password" name="password" class="form-control form-control-sm" placeholder="Security Password" required>
@@ -135,7 +137,7 @@
                         <input type="text" name="trustee_code" class="form-control form-control-sm" placeholder="e.g. GYS-BOT-77" style="background: white;" required>
                         
                         <label class="small fw-bold text-dark mb-1">Security Passcode</label>
-                        <input type="password" name="password" class="form-control form-control-sm" placeholder="••••••••" style="background: white;" required>
+                        <input type="password" name="password" class="form-control form-control-sm" placeholder="Password" style="background: white;" required>
                         
                         <button type="submit" class="btn-auth">Authenticate & Launch Terminal</button>
                     </form>
