@@ -3,32 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYS Synchronization</title>
+    <title>GYS - Core Synchronization</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #04111d; color: #f8fafc; font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
-        .sync-card { background: rgba(15, 23, 42, 0.95); border: 1px solid #1d4ed8; border-radius: 16px; padding: 35px; width: min(620px, 90%); box-shadow: 0 20px 60px rgba(15,23,42,0.6); }
-        .sync-card h1 { color: #60a5fa; margin-bottom: 15px; }
-        .sync-card p { color: #cbd5e1; margin-bottom: 25px; }
-        .progress { height: 14px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,0.08); }
-        .progress-bar { background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
-        .note { color: #94a3b8; font-size: 0.92rem; margin-top: 20px; }
+        body { background-color: #0f172a; color: #ffd700; font-family: 'Courier New', Courier, monospace; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .sync-card { background: #1e293b; border: 2px solid #ffd700; border-radius: 8px; padding: 40px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .progress-bar-custom { background-color: #334155; border-radius: 4px; overflow: hidden; height: 12px; margin: 20px 0; }
+        .progress-fill { background-color: #228b22; height: 100%; width: 0%; transition: width 0.1s linear; box-shadow: 0 0 8px #228b22; }
+        .terminal-log { font-size: 12px; color: #94a3b8; background-color: #020617; padding: 12px; border-radius: 4px; height: 100px; overflow-y: hidden; margin-top: 15px; border: 1px solid #334155; }
     </style>
 </head>
 <body>
+
     <div class="sync-card text-center">
-        <h1>Synchronizing GYS Command Central</h1>
-        <p>Board Terminal authentication is confirmed. The command center is initializing secure session synchronization before redirecting into the dashboard.</p>
-        <div class="progress mb-3">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+        <h4 class="fw-bold tracking-wider">🔒 AUTHORIZING GATEWAY</h4>
+        <p class="text-white small font-monospace mt-1">Establishing Secure Node Linkage...</p>
+        
+        <div class="progress-bar-custom">
+            <div id="fill" class="progress-fill"></div>
         </div>
-        <p class="text-white-50">Please wait while the system completes the secure update.</p>
-        <p class="note">You will be redirected automatically to the protected dashboard in a few seconds.</p>
+        
+        <div class="fw-bold font-monospace" id="status" style="font-size: 13px; color: #ffd700;">INITIALIZING LEDGER RESYNC [0%]</div>
+        
+        <div class="terminal-log text-start" id="log">
+            &gt; Validating security pass strings...<br>
+        </div>
     </div>
+
     <script>
-        setTimeout(function() {
-            window.location.href = '/dashboard';
-        }, 3800);
+        const statusText = document.getElementById('status');
+        const progressBar = document.getElementById('fill');
+        const logBox = document.getElementById('log');
+        
+        const updates = [
+            { pct: 15, msg: "FETCHING RESIDENT METRIC DATABASE...", log: "> Requesting record rows from local registry DB..." },
+            { pct: 40, msg: "SYNCHRONIZING WARD LEDGER ENTRIES...", log: "> Verifying alignment fields & area counts..." },
+            { pct: 70, msg: "DECRYPTING PVC ATTRIBUTE MAPS...", log: "> Clearing system security variables..." },
+            { pct: 90, msg: "COMPILING CENTRAL COMMAND TERMINAL...", log: "> Rendering secure administrative dataset..." },
+            { pct: 100, msg: "ACCESS GRANTED. ENTERING CENTRAL NETWORK.", log: "> Handshake complete. Safe routing initialized." }
+        ];
+
+        let currentPercent = 0;
+        let index = 0;
+
+        const interval = setInterval(() => {
+            if (currentPercent >= 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    window.location.href = "/admin/dashboard";
+                }, 1000);
+                return;
+            }
+
+            currentPercent += 2;
+            progressBar.style.width = currentPercent + "%";
+            statusText.innerText = `SYNCHRONIZING REPOSITORY FILES [${currentPercent}%]`;
+
+            if (index < updates.length && currentPercent >= updates[index].pct) {
+                statusText.innerText = updates[index].msg;
+                logBox.innerHTML += `<br>${updates[index].log}`;
+                index++;
+            }
+        }, 60);
     </script>
 </body>
 </html>

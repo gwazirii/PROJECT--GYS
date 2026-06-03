@@ -2,102 +2,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYS Executive Dashboard</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <title>GYS - Board Command Terminal</title>
     <style>
-        body { background-color: #121212; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar { background-color: #1f1f1f; border-bottom: 2px solid #0d6efd; }
-        .card { background-color: #1f1f1f; border: 1px solid #333; }
-        .table { color: #e0e0e0; }
-        .table-striped>tbody>tr:nth-of-type(odd) { --bs-table-accent-bg: rgba(255, 255, 255, 0.05); color: #e0e0e0; }
-        .badge-pending { background-color: #ffc107; color: #000; }
-        .badge-approved { background-color: #198754; color: #fff; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 30px; background-color: #f1f5f9; color: #0f172a; }
+        .header { background: #0f172a; color: white; padding: 20px; border-radius: 8px; border-bottom: 4px solid #ffd700; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 20px; color: #ffd700; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+        th { background-color: #228b22; color: white; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+        .btn-exit { background-color: #ef4444; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; float: right; font-size: 13px; margin-top: -5px; }
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-pending { background-color: #fef08a; color: #854d0e; }
+        .status-active { background-color: #dcfce7; color: #166534; }
+        .btn-approve { background-color: #228b22; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .flash { background: #dcfce7; color: #166534; padding: 12px; border-radius: 6px; font-weight: bold; margin-bottom: 20px; font-size: 13px; border: 1px solid #bbf7d0;}
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark px-4">
-        <a class="navbar-brand fw-bold text-primary" href="#">GYS OPERATIONS CONTROL HUB</a>
-        <div class="ms-auto">
-            <span class="text-muted me-3">Role: Trustee Board</span>
-            <a href="/logout" class="btn btn-outline-danger btn-sm">Secure Logout</a>
-        </div>
-    </nav>
-
-    <div class="container mt-5">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-info alert-dismissible fade show bg-dark text-info border-info" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <div class="card p-4 shadow">
-            <h3 class="mb-4 text-white fw-bold">Registered Citizens & Mobilization Profiles</h3>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr class="text-secondary border-bottom border-secondary">
-                            <th>ID</th>
-                            <th>Full Name</th>
-                            <th>Stream / Stream Type</th>
-                            <th>Phone Number</th>
-                            <th>Email Address</th>
-                            <th>Location Details</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for citizen in citizens %}
-                        <tr class="border-bottom border-secondary">
-                            <td>{{ citizen.id }}</td>
-                            <td class="fw-bold text-white">{{ citizen.full_name }}</td>
-                            <td>
-                                {% if citizen.reg_type == 'TR_Citizen' %}
-                                    <span class="badge bg-primary">GRA Resident</span>
-                                {% else %}
-                                    <span class="badge bg-info text-dark">General Mobilization</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ citizen.phone }}</td>
-                            <td>{{ citizen.email }}</td>
-                            <td>
-                                {% if citizen.reg_type == 'TR_Citizen' %}
-                                    Area: {{ citizen.area_name }} | House: {{ citizen.house_number }}
-                                {% else %}
-                                    Ward: {{ citizen.ward }} | PVC: {{ citizen.pvc_number }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if citizen.approved %}
-                                    <span class="badge badge-approved">Active / Verified</span>
-                                {% else %}
-                                    <span class="badge badge-pending">Pending Review</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if not citizen.approved %}
-                                    <a href="/admin/approve/{{ citizen.id }}" class="btn btn-success btn-sm fw-bold">Grant Entry Authorization</a>
-                                {% else %}
-                                    <button class="btn btn-sm btn-outline-secondary" disabled>Authorized</button>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="8" class="text-center py-4 text-muted">No profiles currently registered in the database repository.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="header">
+        <a href="/logout" class="btn-exit">Close Terminal</a>
+        <h1>🛡️ GYS Board Command Central</h1>
+        <p style="margin: 5px 0 0 0; font-size: 13px; color: #94a3b8;">Official secure database registry mapping confirmed residents.</p>
     </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <h2>Registered Citizen Database File ({{ citizens|length }} Total)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Record ID</th>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Phone Number</th>
+                <th>Ward Location</th>
+                <th>PVC Number</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for citizen in citizens %}
+            <tr>
+                <td><strong>#00{{ citizen.id }}</strong></td>
+                <td>{{ citizen.full_name }}</td>
+                <td>{{ citizen.email }}</td>
+                <td>{{ citizen.phone }}</td>
+                <td>
+                    {% if citizen.reg_type == 'TR_Citizen' %}
+                        {{ citizen.area_name }}
+                    {% else %}
+                        {{ citizen.ward }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if citizen.pvc_number %}
+                        <code>{{ citizen.pvc_number }}</code>
+                    {% else %}
+                        <span style="color: #94a3b8; font-style: italic;">TR Resident (No PVC)</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if citizen.approved %}
+                        <span class="status-badge status-active">Active</span>
+                    {% else %}
+                        <span class="status-badge status-pending">Pending Approval</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not citizen.approved %}
+                        <a href="/admin/approve/{{ citizen.id }}" class="btn-approve">Approve Profile</a>
+                    {% else %}
+                        <span style="color: #94a3b8; font-size: 11px;">Validated Verified</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" style="text-align: center; color: #64748b; padding: 30px;">No records mapped in the registry database yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 </body>
 </html>
