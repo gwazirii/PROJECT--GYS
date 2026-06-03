@@ -1,6 +1,7 @@
 import os
 import time
 from datetime import datetime
+from pathlib import Path
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
@@ -16,7 +17,8 @@ os.makedirs(app.instance_path, exist_ok=True)
 
 # 3. Assign configurations
 app.secret_key = os.getenv('SECRET_KEY', 'gys_secure_system_key_2026')
-database_url = os.getenv('DATABASE_URL', 'sqlite:///gys_registry.db')
+default_database = Path(app.instance_path) / 'gys_registry.db'
+database_url = os.getenv('DATABASE_URL', f"sqlite:///{default_database.as_posix()}")
 if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
@@ -25,24 +27,20 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # 4. Initialize DB
 db = SQLAlchemy(app)
 
-# 5. Unified Citizen ledger model
+# 5. Citizen registration ledger model
 class Citizen(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    reg_type = db.Column(db.String(50), nullable=False)  # 'TR_Citizen' or 'General_Campaign'
     full_name = db.Column(db.String(150), nullable=False)
     phone = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(150), nullable=True)
+    reg_type = db.Column(db.String(50), nullable=False)  # TR_Citizen or General
     password = db.Column(db.String(150), nullable=False)
-    
-    # GRA Resident Specific Attributes
-    area_name = db.Column(db.String(150), nullable=True)
-    house_number = db.Column(db.String(50), nullable=True)
-    
-    # General Campaign Specific Attributes
     ward = db.Column(db.String(100), nullable=True)
     pvc_number = db.Column(db.String(100), nullable=True)
-    
-    # Authorization state
+
+    # Extra portal fields used by the current templates and approval workflow.
+    email = db.Column(db.String(150), nullable=True)
+    area_name = db.Column(db.String(150), nullable=True)
+    house_number = db.Column(db.String(50), nullable=True)
     approved = db.Column(db.Boolean, default=False)
 
 class ChatMessage(db.Model):
@@ -103,6 +101,7 @@ def register_tr():
             full_name=full_name,
             phone=phone,
             email=email,
+            ward=ward_or_area,
             area_name=ward_or_area,
             password=hashed,
             approved=False
@@ -134,7 +133,7 @@ def register_general():
 
         hashed = generate_password_hash(password, method='pbkdf2:sha256') if password else ''
         new_campaigner = Citizen(
-            reg_type='General_Campaign',
+            reg_type='General',
             full_name=full_name,
             phone=phone,
             email=email,
@@ -210,7 +209,7 @@ def sync_processing_gate():
 # 3. Clean Command Central Dashboard Endpoint
 @app.route('/admin/dashboard')
 def admin_dashboard():
-    if not session.get('is_admin'):
+    if session.get('is_admin') is not True:
         flash("Restricted administrative entry path. Authorization required.")
         return redirect(url_for('gate'))
         

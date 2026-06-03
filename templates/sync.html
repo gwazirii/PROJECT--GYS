@@ -1,70 +1,180 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYS - Core Synchronization</title>
+    <title>GYS - Security Synchronization</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #0f172a; color: #ffd700; font-family: 'Courier New', Courier, monospace; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
-        .sync-card { background: #1e293b; border: 2px solid #ffd700; border-radius: 8px; padding: 40px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .progress-bar-custom { background-color: #334155; border-radius: 4px; overflow: hidden; height: 12px; margin: 20px 0; }
-        .progress-fill { background-color: #228b22; height: 100%; width: 0%; transition: width 0.1s linear; box-shadow: 0 0 8px #228b22; }
-        .terminal-log { font-size: 12px; color: #94a3b8; background-color: #020617; padding: 12px; border-radius: 4px; height: 100px; overflow-y: hidden; margin-top: 15px; border: 1px solid #334155; }
+        :root {
+            --gys-green: #228b22;
+            --gys-yellow: #ffd700;
+            --terminal-bg: #020617;
+            --terminal-panel: #0f172a;
+            --terminal-line: #334155;
+            --terminal-text: #e2e8f0;
+            --terminal-muted: #94a3b8;
+        }
+
+        body {
+            align-items: center;
+            background:
+                radial-gradient(circle at top, rgba(34, 139, 34, 0.18), transparent 34%),
+                linear-gradient(135deg, #020617 0%, #0f172a 55%, #111827 100%);
+            color: var(--terminal-text);
+            display: flex;
+            font-family: "Courier New", Courier, monospace;
+            justify-content: center;
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .sync-terminal {
+            background: rgba(15, 23, 42, 0.94);
+            border: 1px solid rgba(255, 215, 0, 0.55);
+            border-radius: 8px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 28px rgba(34, 139, 34, 0.16);
+            max-width: 620px;
+            padding: 32px;
+            width: 100%;
+        }
+
+        .terminal-kicker {
+            color: var(--gys-yellow);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .terminal-title {
+            color: #ffffff;
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin: 8px 0 6px;
+        }
+
+        .terminal-subtitle {
+            color: var(--terminal-muted);
+            font-size: 0.86rem;
+            margin-bottom: 24px;
+        }
+
+        .progress-shell {
+            background: #020617;
+            border: 1px solid var(--terminal-line);
+            border-radius: 999px;
+            height: 16px;
+            overflow: hidden;
+            padding: 3px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--gys-green), var(--gys-yellow));
+            border-radius: 999px;
+            box-shadow: 0 0 18px rgba(255, 215, 0, 0.45);
+            height: 100%;
+            transition: width 0.12s linear;
+            width: 0%;
+        }
+
+        .progress-meta {
+            align-items: center;
+            color: var(--gys-yellow);
+            display: flex;
+            font-size: 0.82rem;
+            font-weight: 800;
+            justify-content: space-between;
+            margin: 12px 0 18px;
+            text-transform: uppercase;
+        }
+
+        .log-window {
+            background: var(--terminal-bg);
+            border: 1px solid var(--terminal-line);
+            border-radius: 8px;
+            color: #cbd5e1;
+            font-size: 0.82rem;
+            height: 170px;
+            line-height: 1.6;
+            overflow: hidden;
+            padding: 16px;
+        }
+
+        .log-line {
+            display: block;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            background: var(--gys-green);
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(34, 139, 34, 0.85);
+            display: inline-block;
+            height: 9px;
+            margin-right: 8px;
+            width: 9px;
+        }
     </style>
 </head>
 <body>
+    <main class="sync-terminal text-center">
+        <div class="terminal-kicker">Board Authentication Bridge</div>
+        <h1 class="terminal-title">Decrypting Administrative Session</h1>
+        <p class="terminal-subtitle">Synchronizing trustee credentials with the GYS registry command layer.</p>
 
-    <div class="sync-card text-center">
-        <h4 class="fw-bold text-uppercase tracking-wider">SECURE AUTHORIZING GATEWAY</h4>
-        <p class="text-white small font-monospace mt-1">Establishing Secure Node Linkage...</p>
-        
-        <div class="progress-bar-custom">
-            <div id="fill" class="progress-fill"></div>
+        <div class="progress-shell">
+            <div id="progressFill" class="progress-fill"></div>
         </div>
-        
-        <div class="fw-bold font-monospace" id="status" style="font-size: 13px; color: #ffd700;">INITIALIZING LEDGER RESYNC [0%]</div>
-        
-        <div class="terminal-log text-start" id="log">
-            &gt; Validating security pass strings...<br>
+
+        <div class="progress-meta">
+            <span><span class="status-dot"></span><span id="statusText">Initializing decryption</span></span>
+            <span id="progressPercent">0%</span>
         </div>
-    </div>
+
+        <div id="logWindow" class="log-window text-start">
+            <span class="log-line">&gt; Opening encrypted board terminal channel...</span>
+        </div>
+    </main>
 
     <script>
-        const statusText = document.getElementById('status');
-        const progressBar = document.getElementById('fill');
-        const logBox = document.getElementById('log');
-        
-        const updates = [
-            { pct: 15, msg: "FETCHING RESIDENT METRIC DATABASE...", log: "> Requesting record rows from local registry DB..." },
-            { pct: 40, msg: "SYNCHRONIZING WARD LEDGER ENTRIES...", log: "> Verifying alignment fields & area counts..." },
-            { pct: 70, msg: "DECRYPTING PVC ATTRIBUTE MAPS...", log: "> Clearing system security variables..." },
-            { pct: 90, msg: "COMPILING CENTRAL COMMAND TERMINAL...", log: "> Rendering secure administrative dataset..." },
-            { pct: 100, msg: "ACCESS GRANTED. ENTERING CENTRAL NETWORK.", log: "> Handshake complete. Safe routing initialized." }
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+        const statusText = document.getElementById('statusText');
+        const logWindow = document.getElementById('logWindow');
+
+        const checkpoints = [
+            { pct: 12, status: 'Validating access token', log: '> Decrypting trustee passcode signature...' },
+            { pct: 28, status: 'Reading registry index', log: '> Loading protected citizen table references...' },
+            { pct: 46, status: 'Unlocking dashboard route', log: '> Decrypting administrative route permissions...' },
+            { pct: 64, status: 'Verifying database session', log: '> Matching approval keys against registry state...' },
+            { pct: 82, status: 'Compiling command view', log: '> Preparing Board Command Central interface...' },
+            { pct: 100, status: 'Access granted', log: '> Decryption complete. Redirecting to dashboard...' }
         ];
 
-        let currentPercent = 0;
-        let index = 0;
+        let progress = 0;
+        let checkpointIndex = 0;
 
-        const interval = setInterval(() => {
-            if (currentPercent >= 100) {
-                clearInterval(interval);
+        const timer = setInterval(() => {
+            progress += 2;
+            progressFill.style.width = progress + '%';
+            progressPercent.textContent = progress + '%';
+
+            if (checkpointIndex < checkpoints.length && progress >= checkpoints[checkpointIndex].pct) {
+                statusText.textContent = checkpoints[checkpointIndex].status;
+                logWindow.innerHTML += `<span class="log-line">${checkpoints[checkpointIndex].log}</span>`;
+                logWindow.scrollTop = logWindow.scrollHeight;
+                checkpointIndex++;
+            }
+
+            if (progress >= 100) {
+                clearInterval(timer);
                 setTimeout(() => {
-                    window.location.href = "/admin/dashboard";
-                }, 1000);
-                return;
+                    window.location.href = '/admin/dashboard';
+                }, 900);
             }
-
-            currentPercent += 2;
-            progressBar.style.width = currentPercent + "%";
-            statusText.innerText = `SYNCHRONIZING REPOSITORY FILES [${currentPercent}%]`;
-
-            if (index < updates.length && currentPercent >= updates[index].pct) {
-                statusText.innerText = updates[index].msg;
-                logBox.innerHTML += `<br>${updates[index].log}`;
-                index++;
-            }
-        }, 60);
+        }, 80);
     </script>
 </body>
 </html>
