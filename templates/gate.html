@@ -151,26 +151,6 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand" href="/">
-                GYS
-            </a>
-            
-            <div class="d-flex mx-auto search-wrapper">
-                <input class="search-bar" type="search" placeholder="Search platform..." aria-label="Search">
-                <button class="btn-search" type="button">Search</button>
-            </div>
-
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Our Work</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Ideas</a></li>
-            </ul>
-        </div>
-    </nav>
-
     <div class="container main-container">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -180,89 +160,70 @@
             {% endif %}
         {% endwith %}
 
+        <div class="text-center mb-4">
+            <h1 class="fw-bold">GYS Board Terminal Entry</h1>
+            <p class="sub-text">Welcome to the secure access page. Use Create Account or Account Portal to begin registration, then use the Board Terminal Gate to enter the GYS Command Central.</p>
+            <div class="alert alert-info mt-3" role="alert">
+                <strong>Synchronization required.</strong> After trustee authentication, the system will synchronize before granting access to the main dashboard.
+            </div>
+        </div>
+
         <div class="row g-4">
             <div class="col-md-4">
-                <h3 class="col-title">Organization Profile</h3>
-
-                <img class="video-placeholder" src="{{ url_for('static', filename='logo.png') }}" alt="GYS Logo">
-
-                <p class="sub-text">GRA Youth Supporters is a trusted local network for mobilizing residents and campaign teams, supporting secure community mapping and leadership coordination.</p>
-
-                <div class="status-box">
-                    User Connected: Board Trustee Member
-                </div>
-                <a href="{{ url_for('logout') }}" class="disconnect-link">Disconnect Account</a>
-
-                <div class="mt-4 p-3 bg-light rounded border-start border-4 border-success">
-                    <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-target me-2"></i> Aims & Objectives</h6>
-                    <ul class="small text-muted ps-3 mb-0">
-                        <li>Mobilize youth participation in community development</li>
-                        <li>Strengthen regional security and identification mapping</li>
-                        <li>Foster inclusive governance and citizen engagement</li>
-                        <li>Promote transparent administrative operations</li>
-                    </ul>
-                </div>
-
-                <div class="mt-4 p-3 bg-light rounded border-start border-4 border-info">
-                    <h6 class="fw-bold text-info mb-2"><i class="fa-solid fa-tasks me-2"></i> Core Activities</h6>
-                    <ul class="small text-muted ps-3 mb-0">
-                        <li>Member registration & verification</li>
-                        <li>Community mobilization campaigns</li>
-                        <li>Ward-level coordination & mapping</li>
-                        <li>Security clearance administration</li>
-                        <li>Event planning & execution</li>
-                    </ul>
-                </div>
-
-                <div class="mt-4 p-3 bg-light rounded border-start border-4 border-warning">
-                    <h6 class="fw-bold text-warning mb-3"><i class="fa-solid fa-users-gear me-2"></i> Board of Trustees</h6>
-                    <div class="small">
-                        <div class="pb-2 border-bottom">
-                            <span class="fw-bold text-dark">Chairman</span><br>
-                            <span class="text-muted">Designated Authority</span>
-                        </div>
-                        <div class="pb-2 border-bottom mt-2">
-                            <span class="fw-bold text-dark">Vice Chairman</span><br>
-                            <span class="text-muted">Operations Lead</span>
-                        </div>
-                        <div class="pb-2 border-bottom mt-2">
-                            <span class="fw-bold text-dark">Secretary</span><br>
-                            <span class="text-muted">Records & Communications</span>
-                        </div>
-                        <div class="mt-2">
-                            <span class="fw-bold text-dark">Treasurer</span><br>
-                            <span class="text-muted">Finance Administration</span>
-                        </div>
+                <div class="card p-4 shadow-sm rounded">
+                    <h3 class="col-title">Create Account</h3>
+                    <p class="sub-text">Register a new GRA Resident or General Mobilization profile before access is granted.</p>
+                    <div class="mb-4 p-3 bg-light rounded border-start border-4 border-success">
+                        <h6 class="fw-bold text-success mb-2">GRA Resident</h6>
+                        <form action="/register/tr" method="POST">
+                            <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
+                            <input type="text" name="area_name" class="form-control" placeholder="Area Name" required>
+                            <input type="text" name="house_number" class="form-control" placeholder="House Number" required>
+                            <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                            <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
+                            <input type="password" name="password" class="form-control" placeholder="Create Access Password" required>
+                            <button type="submit" class="btn-register mt-2">Create GRA Account</button>
+                        </form>
+                    </div>
+                    <div class="p-3 bg-light rounded border-start border-4 border-info">
+                        <h6 class="fw-bold text-info mb-2">General Mobilization</h6>
+                        <form action="/register/general" method="POST">
+                            <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
+                            <input type="text" name="ward" class="form-control" placeholder="Ward Name" required>
+                            <input type="text" name="pvc_number" class="form-control" placeholder="PVC Number" required>
+                            <input type="text" name="address" class="form-control" placeholder="Address" required>
+                            <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                            <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
+                            <input type="password" name="password" class="form-control" placeholder="Create Access Password" required>
+                            <button type="submit" class="btn-register mt-2">Create Mobilization Account</button>
+                        </form>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <h3 class="col-title">GRA Citizen Portal</h3>
-                <p class="sub-text">Official secure directory mapping for confirmed local residents.</p>
-                <span class="green-label">CREATE CITIZEN REGISTRY FILE</span>
-                <form action="/register/tr" method="POST">
-                    <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
-                    <input type="text" name="area_name" class="form-control" placeholder="Area Name" required>
-                    <input type="text" name="house_number" class="form-control" placeholder="House Number" required>
-                    <input type="email" name="email" class="form-control" placeholder="Email Address" required>
-                    <input type="tel" name="phone" class="form-control" placeholder="Phone Line Contact" required>
-                    <input type="password" name="password" class="form-control" placeholder="Establish Secure Password" required>
-                    <button type="submit" class="btn-register">Register Identity</button>
-                </form>
+                <div class="card p-4 shadow-sm rounded">
+                    <h3 class="col-title">Account Portal Access</h3>
+                    <p class="sub-text">Verified residents can login to review their account status. Dashboard access is reserved for Board Terminal authentication.</p>
+                    <form action="/citizen/login" method="POST">
+                        <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <button type="submit" class="btn-register mt-2" style="background-color: #6c757d;">Login Portal</button>
+                    </form>
+                </div>
             </div>
 
             <div class="col-md-4">
-                <div class="board-terminal">
+                <div class="board-terminal shadow-sm rounded">
                     <h3 class="col-title">Board Terminal Gate</h3>
-                    <p class="sub-text">Restricted administrative node. Verification clearance string required.</p>
+                    <p class="sub-text">Use this secure gateway to access the GYS Board Command Central. Synchronization begins immediately after authentication.</p>
                     <form action="/trustee/login" method="POST">
                         <input type="text" name="trustee_username" class="form-control" placeholder="Trustee Username" required>
                         <input type="password" name="authentication_number" class="form-control" placeholder="Authentication Number" required>
-                        <button type="submit" class="btn-auth">Authenticate & Launch Dashboard</button>
+                        <button type="submit" class="btn-auth mt-2">Authenticate & Proceed</button>
                     </form>
                     <div class="text-center mt-4">
-                        <small class="text-muted" style="font-size: 10px;">Activate Windows<br>Go to Settings to activate Windows.</small>
+                        <small class="text-muted">The board terminal is the only route to the main dashboard.</small>
                     </div>
                 </div>
             </div>

@@ -70,7 +70,7 @@ def record_log(event_type, message):
 # --- SECURITY GATEKEEPER MIDDLEWARE ---
 @app.before_request
 def check_security_clearance():
-    allowed_routes = ['gate', 'admin_gate', 'register_tr', 'register_general', 'citizen_login', 'trustee_login', 'static']
+    allowed_routes = ['gate', 'admin_gate', 'register_tr', 'register_general', 'citizen_login', 'trustee_login', 'sync', 'logout', 'static']
     if request.endpoint not in allowed_routes and 'user_name' not in session:
         return redirect(url_for('gate'))
 
@@ -88,6 +88,8 @@ def admin_gate():
 
 @app.route('/')
 def home():
+    if session.get('role') == 'trustee':
+        return redirect(url_for('dashboard'))
     if session.get('role') == 'citizen' and not session.get('approved'):
         flash('Waiting for Trustee authorization clearance.')
         session.clear()
@@ -182,11 +184,17 @@ def trustee_login():
         session['user_name'] = "Board Trustee Member"
         session['role'] = 'trustee'
         record_log('trustee_login', 'Board Trustee authenticated and entered the dashboard.')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('sync'))
     
     flash('Access Denied: Invalid Username or Authentication Key.')
     record_log('access_denied', f'Failed trustee login attempt for {trustee_username}.')
     return redirect(url_for('gate'))
+
+@app.route('/sync')
+def sync():
+    if session.get('role') != 'trustee':
+        return redirect(url_for('gate'))
+    return render_template('sync.html')
 
 @app.route('/dashboard')
 def dashboard():
