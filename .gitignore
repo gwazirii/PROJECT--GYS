@@ -1,56 +1,18 @@
-# --- User Specific Track Files ---
-members.txt
-field_reports.txt
-
-# --- Local Databases & Sensitive Assets ---
-*.db
-*.sqlite
-*.sqlite3
-gys_registry.db
-instance/
+# Local Environment Secrets
 .env
-.env.*
+.env.local
+.env.secret
 
-# --- Python Byte-compiled / Cache ---
+# Local Database Files
+instance/
+gys_registry.db
+
+# Python Caches & Build Files
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
+*.pyd
 .pytest_cache/
-
-# --- Virtual environments ---
 .venv/
-venv/
-ENV/
 env/
-
-# --- IDE / Editor ---
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-
-# --- Build / Packaging ---
-build/
-dist/
-*.egg-info/
-pip-wheel-metadata/
-*.egg
-
-# --- Testing / Coverage ---
-.coverage
-.coverage.*
-coverage.xml
-htmlcov/
-
-# --- Logs ---
-*.log
-
-# --- OS files ---
-.DS_Store
-Thumbs.db
-
-# --- Misc ---
-.mypy_cache/
-*.whl
+venv/
