@@ -1,46 +1,49 @@
 import os
+import time
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from flask_mail import Mail, Message
+from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__)
-app.secret_key = 'gys_secure_system_key_2026'
+# 1. Load environment variables
+load_dotenv()
 
-# --- EMAIL CONFIGURATION ---
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'your_organization_email@gmail.com'
-app.config['MAIL_PASSWORD'] = 'your_gmail_app_password'
-app.config['MAIL_DEFAULT_SENDER'] = ('GYS Platform', 'your_organization_email@gmail.com')
-mail = Mail(app)
+# 2. Application setup (supports Render)
+application = Flask(__name__)
+app = application  # Dual alias mapping for local vs Render configurations
 
-# --- DATABASE CONFIGURATION ---
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'gys_registry.db')
+# 3. Assign configurations
+app.secret_key = os.getenv('SECRET_KEY', 'gys_secure_system_key_2026')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///gys_registry.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# 4. Initialize DB
 db = SQLAlchemy(app)
 
-# Comprehensive Database Model for All Registrants
+# 5. Unified Citizen ledger model
 class Citizen(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    reg_type = db.Column(db.String(50), nullable=False) # 'TR_Citizen' or 'General_Mobilization'
-    full_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
+    reg_type = db.Column(db.String(50), nullable=False)  # 'TR_Citizen' or 'General_Campaign'
+    full_name = db.Column(db.String(150), nullable=False)
+    phone = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(150), nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+    
+    # GRA Resident Specific Attributes
+    area_name = db.Column(db.String(150), nullable=True)
+    house_number = db.Column(db.String(50), nullable=True)
+    
+    # General Campaign Specific Attributes
+    ward = db.Column(db.String(100), nullable=True)
+    pvc_number = db.Column(db.String(100), nullable=True)
+    
+    # Authorization state
     approved = db.Column(db.Boolean, default=False)
 
-    # TR Specific Fields
-    area_name = db.Column(db.String(100), nullable=True)
-    house_number = db.Column(db.String(50), nullable=True)
-
-    # Campaign Mobilization Fields
-    ward = db.Column(db.String(100), nullable=True)
-    pvc_number = db.Column(db.String(50), unique=True, nullable=True)
-    address = db.Column(db.Text, nullable=True)
+# Initialize tables
+with app.app_context():
+    db.create_all()
 
 class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,23 +52,18 @@ class ChatMessage(db.Model):
     message_text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-with app.app_context():
-    db.create_all()
-
 # --- SECURITY GATEKEEPER MIDDLEWARE ---
 @app.before_request
 def check_security_clearance():
-    allowed_routes = ['gate', 'register_tr', 'register_general', 'citizen_login', 'trustee_login', 'static']
+    allowed_routes = ['gate', 'register_tr', 'register_general', 'citizen_login', 'trustee_login', 'sync_processing_gate', 'admin_dashboard', 'approve_citizen', 'logout', 'static']
     if request.endpoint not in allowed_routes and 'user_name' not in session:
         return redirect(url_for('gate'))
-
-@app.route('/gate')
+@app.route('/')
 def gate():
-    if 'user_name' in session:
-        return redirect(url_for('home'))
     return render_template('gate.html')
 
-@app.route('/')
+
+@app.route('/home')
 def home():
     if session.get('role') == 'citizen' and not session.get('approved'):
         flash('Your registration profile is currently pending review. Access will be authorized once a Trustee verifies your credentials.')
@@ -73,58 +71,72 @@ def home():
         return redirect(url_for('gate'))
     return render_template('index.html')
 
-# 1. TR CITIZEN REGISTRATION ROUTE
+# 1. Stream A Form: GRA Resident Submission Handler
 @app.route('/register/tr', methods=['POST'])
 def register_tr():
-    full_name = request.form.get('full_name')
-    area_name = request.form.get('area_name')
-    house_number = request.form.get('house_number')
-    phone = request.form.get('phone')
-    email = request.form.get('email')
-    password = request.form.get('password')
+    try:
+        full_name = request.form.get('full_name')
+        phone = request.form.get('phone')
+        ward_or_area = request.form.get('ward') or request.form.get('area_name')
+        password = request.form.get('password')
 
-    if Citizen.query.filter((Citizen.phone == phone) | (Citizen.email == email)).first():
-        flash('Registration Error: Phone number or Email already exists inside the GYS system.')
+        # Prevent duplicates
+        existing = Citizen.query.filter_by(phone=phone).first()
+        if existing:
+            flash('Registration failed. Phone line already logged in database system.')
+            return redirect(url_for('gate'))
+
+        hashed = generate_password_hash(password, method='pbkdf2:sha256') if password else ''
+        new_resident = Citizen(
+            reg_type='TR_Citizen',
+            full_name=full_name,
+            phone=phone,
+            area_name=ward_or_area,
+            password=hashed,
+            approved=False
+        )
+        db.session.add(new_resident)
+        db.session.commit()
+
+        flash('GRA Resident identity file created successfully! Awaiting board verification.')
+        return redirect(url_for('gate'))
+    except Exception as e:
+        flash(f'System Entry Error: {str(e)}')
         return redirect(url_for('gate'))
 
-    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-    new_tr = Citizen(
-        reg_type='TR_Citizen', full_name=full_name, area_name=area_name,
-        house_number=house_number, phone=phone, email=email,
-        password=hashed_password, approved=False
-    )
-    db.session.add(new_tr)
-    db.session.commit()
-
-    flash('Profile Saved! Your TR Citizen account is pending executive validation.')
-    return redirect(url_for('gate'))
-
-# 2. GENERAL CAMPAIGN MOBILIZATION ROUTE (REQUIRES PVC)
+# 2. Stream B Form: General Campaign Registration Handler
 @app.route('/register/general', methods=['POST'])
 def register_general():
-    full_name = request.form.get('full_name')
-    address = request.form.get('address')
-    ward = request.form.get('ward')
-    pvc_number = request.form.get('pvc_number')
-    phone = request.form.get('phone')
-    email = request.form.get('email')
-    password = request.form.get('password')
+    try:
+        full_name = request.form.get('full_name')
+        phone = request.form.get('phone')
+        ward = request.form.get('ward')
+        pvc_number = request.form.get('pvc_number')
+        password = request.form.get('password')
 
-    if Citizen.query.filter((Citizen.phone == phone) | (Citizen.email == email) | (Citizen.pvc_number == pvc_number)).first():
-        flash('Registration Error: Phone, Email, or PVC Number already exists inside our mobilization directory.')
+        existing = Citizen.query.filter_by(phone=phone).first()
+        if existing:
+            flash('Registration failed. Profile parameters already exist.')
+            return redirect(url_for('gate'))
+
+        hashed = generate_password_hash(password, method='pbkdf2:sha256') if password else ''
+        new_campaigner = Citizen(
+            reg_type='General_Campaign',
+            full_name=full_name,
+            phone=phone,
+            ward=ward,
+            pvc_number=pvc_number,
+            password=hashed,
+            approved=False
+        )
+        db.session.add(new_campaigner)
+        db.session.commit()
+
+        flash('Campaign Profile registered! Profile pending administrative authorization.')
         return redirect(url_for('gate'))
-
-    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-    new_general = Citizen(
-        reg_type='General_Mobilization', full_name=full_name, address=address,
-        ward=ward, pvc_number=pvc_number, phone=phone, email=email,
-        password=hashed_password, approved=False
-    )
-    db.session.add(new_general)
-    db.session.commit()
-
-    flash('Campaign Profile Registered! Access pending verification.')
-    return redirect(url_for('gate'))
+    except Exception as e:
+        flash(f'System Registry Error: {str(e)}')
+        return redirect(url_for('gate'))
 
 # LOGIN & TERMINAL OPERATIONS
 @app.route('/citizen/login', methods=['POST'])
@@ -148,16 +160,20 @@ def citizen_login():
 
 @app.route('/trustee/login', methods=['POST'])
 def trustee_login():
-    trustee_username = request.form.get('trustee_username')
-    authentication_number = request.form.get('authentication_number')
+    trustee_code = request.form.get('trustee_code') or request.form.get('trustee_username')
+    password = request.form.get('password') or request.form.get('authentication_number')
 
-    if trustee_username == "GYS-BOT-77" and authentication_number == "Bauchi2026":
+    # Absolute core verification safety handshake logic
+    if trustee_code == "GYS-BOT-77" and password == "Bauchi2026":
+        session['is_admin'] = True
+        session['trustee_node'] = trustee_code
         session['user_name'] = "Board Trustee Member"
-        session['role'] = 'trustee'
-        return redirect(url_for('dashboard'))
 
-    flash('Access Denied: Invalid Username or Authentication Key.')
-    return redirect(url_for('gate'))
+        # Send them directly to the Synchronization Processing view first!
+        return redirect(url_for('sync_processing_gate'))
+    else:
+        flash("ACCESS DENIED: Invalid Administrative Terminal Clearance String.")
+        return redirect(url_for('gate'))
 
 @app.route('/dashboard')
 def dashboard():
@@ -166,15 +182,38 @@ def dashboard():
     all_citizens = Citizen.query.all()
     return render_template('dashboard.html', citizens=all_citizens)
 
+
+# 2. Intermediate Security Synchronization Interface View
+@app.route('/admin/sync-verification')
+def sync_processing_gate():
+    if not session.get('is_admin'):
+        flash("Authentication token missing. Please access the portal terminal gate.")
+        return redirect(url_for('gate'))
+    return render_template('sync.html')
+
+
+# 3. Clean Command Central Dashboard Endpoint
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if not session.get('is_admin'):
+        flash("Restricted administrative entry path. Authorization required.")
+        return redirect(url_for('gate'))
+        
+    # Read all citizen records directly out of our database to map onto the clear table layout
+    all_citizens = Citizen.query.all()
+    return render_template('dashboard.html', citizens=all_citizens)
+
 @app.route('/admin/approve/<int:citizen_id>')
 def approve_citizen(citizen_id):
-    if session.get('role') != 'trustee':
+    if not session.get('is_admin'):
         return redirect(url_for('gate'))
-    citizen = Citizen.query.get_or_404(citizen_id)
-    citizen.approved = True
+        
+    target_profile = Citizen.query.get_or_404(citizen_id)
+    target_profile.approved = True
     db.session.commit()
-    flash(f"Profile for {citizen.full_name} has been activated.")
-    return redirect(url_for('dashboard'))
+    
+    flash(f"Success: Verified tracking file for record ID #00{citizen_id} has been activated.")
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/chat', methods=['GET', 'POST'])
 def chat():
@@ -197,9 +236,11 @@ def history():
 @app.route('/logout')
 def logout():
     session.clear()
+    flash("Session connection closed cleanly. Secure node detached.")
     return redirect(url_for('gate'))
 
 application = app
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Used for local development execution parameters
+    app.run(port=8000, debug=True)
