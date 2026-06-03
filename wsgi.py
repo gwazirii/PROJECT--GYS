@@ -15,7 +15,10 @@ app = application  # Dual alias mapping for local vs Render configurations
 
 # 3. Assign configurations
 app.secret_key = os.getenv('SECRET_KEY', 'gys_secure_system_key_2026')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///gys_registry.db')
+database_url = os.getenv('DATABASE_URL', 'sqlite:///gys_registry.db')
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # 4. Initialize DB
@@ -27,7 +30,7 @@ class Citizen(db.Model):
     reg_type = db.Column(db.String(50), nullable=False)  # 'TR_Citizen' or 'General_Campaign'
     full_name = db.Column(db.String(150), nullable=False)
     phone = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(150), nullable=True)
     password = db.Column(db.String(150), nullable=False)
     
     # GRA Resident Specific Attributes
@@ -41,16 +44,22 @@ class Citizen(db.Model):
     # Authorization state
     approved = db.Column(db.Boolean, default=False)
 
-# Initialize tables
-with app.app_context():
-    db.create_all()
-
 class ChatMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_name = db.Column(db.String(100), nullable=False)
     sender_role = db.Column(db.String(20), nullable=False)
     message_text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class LogEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_type = db.Column(db.String(60), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Initialize tables after all models are registered.
+with app.app_context():
+    db.create_all()
 
 # --- SECURITY GATEKEEPER MIDDLEWARE ---
 @app.before_request
@@ -77,6 +86,7 @@ def register_tr():
     try:
         full_name = request.form.get('full_name')
         phone = request.form.get('phone')
+        email = request.form.get('email') or ''
         ward_or_area = request.form.get('ward') or request.form.get('area_name')
         password = request.form.get('password')
 
@@ -91,6 +101,7 @@ def register_tr():
             reg_type='TR_Citizen',
             full_name=full_name,
             phone=phone,
+            email=email,
             area_name=ward_or_area,
             password=hashed,
             approved=False
@@ -110,6 +121,7 @@ def register_general():
     try:
         full_name = request.form.get('full_name')
         phone = request.form.get('phone')
+        email = request.form.get('email') or ''
         ward = request.form.get('ward')
         pvc_number = request.form.get('pvc_number')
         password = request.form.get('password')
@@ -124,6 +136,7 @@ def register_general():
             reg_type='General_Campaign',
             full_name=full_name,
             phone=phone,
+            email=email,
             ward=ward,
             pvc_number=pvc_number,
             password=hashed,
@@ -168,6 +181,7 @@ def trustee_login():
         session['is_admin'] = True
         session['trustee_node'] = trustee_code
         session['user_name'] = "Board Trustee Member"
+        session['role'] = 'trustee'
 
         # Send them directly to the Synchronization Processing view first!
         return redirect(url_for('sync_processing_gate'))
@@ -231,7 +245,8 @@ def chat():
 
 @app.route('/history')
 def history():
-    return render_template('history.html')
+    logs = LogEvent.query.order_by(LogEvent.timestamp.desc()).all()
+    return render_template('history.html', logs=logs)
 
 @app.route('/logout')
 def logout():
