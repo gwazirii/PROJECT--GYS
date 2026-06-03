@@ -3,90 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYS - Central Security Gateway</title>
+    <title>GYS - GRA Youth Supporters Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #0f172a; color: white; margin: 0; padding: 20px; box-sizing: border-box; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .gate-card { width: 100%; max-width: 1200px; background: rgba(255, 255, 255, 0.02); border: 2px solid #228b22; border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #228b22; padding-bottom: 20px; }
-        .header h1 { color: #ffd700; margin: 0; font-size: 26px; text-transform: uppercase; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .box { background: rgba(255, 255, 255, 0.04); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-        .box.admin { border-color: #ffd700; background: rgba(253, 216, 53, 0.01); }
-        h3 { color: #ffd700; margin-top: 0; font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; text-transform: uppercase; }
-        p { font-size: 11px; color: #94a3b8; margin: 5px 0 15px 0; min-height: 32px; }
-        .input-field { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 13px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 11px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-green { background: #228b22; color: white; }
-        .btn-gray { background: #475569; color: white; }
-        .btn-gold { background: #ffd700; color: #0f172a; }
-        .flash { background: #fef08a; color: #854d0e; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 13px; }
+        body { background-color: #f1f5f9; font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; }
+        .navbar { background-color: white; border-bottom: 3px solid #228b22; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .navbar-brand { font-weight: 800; color: #228b22 !important; font-size: 22px; }
+        .main-container { max-width: 1280px; margin: 30px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .col-title { font-weight: 700; color: #1e293b; margin-bottom: 15px; font-size: 1.15rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        .org-sidebar { background-color: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .side-logo { max-height: 85px; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; }
+        .section-heading { font-size: 0.85rem; color: #228b22; font-weight: 700; text-transform: uppercase; margin-top: 15px; margin-bottom: 6px; }
+        .info-text { font-size: 0.82rem; color: #475569; line-height: 1.5; }
+        .custom-list { padding-left: 18px; font-size: 0.82rem; color: #475569; margin-bottom: 10px; }
+        .nav-tabs-custom { display: flex; background: #e2e8f0; border-radius: 6px; padding: 4px; margin-bottom: 15px; }
+        .nav-tabs-custom button { flex: 1; border: none; padding: 8px; font-weight: bold; font-size: 12px; border-radius: 4px; background: none; color: #475569; transition: all 0.2s; }
+        .nav-tabs-custom button.active { background: white; color: #228b22; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .form-control-sm { padding: 8px 12px; background-color: #f8fafc; border: 1px solid #cbd5e1; font-size: 13px; margin-bottom: 12px; border-radius: 6px; }
+        .btn-gys { background-color: #228b22; color: white; font-weight: bold; font-size: 13px; width: 100%; padding: 10px; border: none; border-radius: 6px; }
+        .btn-gys:hover { background-color: #1a6b1a; color: white; }
+        .sub-toggle { display: flex; gap: 8px; background: #f1f5f9; padding: 4px; border-radius: 6px; margin-bottom: 12px; }
+        .sub-toggle button { flex: 1; font-size: 11px; padding: 6px; border: none; border-radius: 4px; background: none; font-weight: 600; color: #64748b; }
+        .sub-toggle button.active { background: #0f172a; color: white; }
+        .board-terminal { background-color: #fffde7; padding: 25px 20px; border-radius: 12px; border: 1px solid #f0e68c; height: 100%; }
+        .btn-auth { background-color: #0f172a; color: white; width: 100%; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 13px; border: none; margin-top: 5px; }
+        .btn-auth:hover { background-color: #1e293b; }
+        .flash-alert { background-color: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="gate-card">
-        <div class="header">
-            <h1>🔒 GYS Platform Operations Control</h1>
-            <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 13px;">Secure identification mapping for regional area residents and campaign mobilization units.</p>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="#">🛡️ GYS PORTAL SYSTEM</a>
+            <div class="ms-auto navbar-nav">
+                <span class="text-secondary small font-monospace">Network Status: SECURE ONLINE</span>
+            </div>
         </div>
+    </nav>
 
+    <div class="container main-container">
         {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="flash">{{ messages[0] }}</div>
-          {% endif %}
+            {% if messages %}
+                <div class="flash-alert shadow-sm">⚠️ {{ messages[0] }}</div>
+            {% endif %}
         {% endwith %}
 
-        <div class="grid">
-            <div class="box">
-                <h3>TR Resident Secure Registry</h3>
-                <p>Exclusive portal for core TR area residents. Requires administration validation check.</p>
-                <form action="/register/tr" method="POST">
-                    <input type="text" name="full_name" placeholder="Full Name" class="input-field" required>
-                    <input type="text" name="area_name" placeholder="Your Area Name" class="input-field" required>
-                    <input type="text" name="house_number" placeholder="House Number" class="input-field" required>
-                    <input type="tel" name="phone" placeholder="Phone Line Contact" class="input-field" required>
-                    <input type="email" name="email" placeholder="Email Address" class="input-field" required>
-                    <input type="password" name="password" placeholder="Establish Secret Password" class="input-field" required>
-                    <button type="submit" class="btn btn-green">Submit Registry File</button>
-                </form>
+        <div class="row g-4">
+            
+            <div class="col-md-4">
+                <div class="org-sidebar">
+                    <img src="/static/logo.png" alt="GYS Official Logo" class="side-logo img-fluid" onerror="this.style.display='none'">
+                    <h5 class="text-center fw-bold mb-3" style="font-size: 15px;">GRA Youth Supporters</h5>
+                    
+                    <h4 class="section-heading">Aim & Objective</h4>
+                    <p class="info-text">To advance technological literacy, implement clean localized demographic database mappings, and drive civic mobilization across infrastructure networks.</p>
+
+                    <h4 class="section-heading">Core Activities</h4>
+                    <ul class="custom-list">
+                        <li>Demographic Resident Mapping</li>
+                        <li>Digital Infrastructure Advocacy</li>
+                        <li>Civic Awareness Campaigns</li>
+                    </ul>
+
+                    <h4 class="section-heading">Board of Trustees</h4>
+                    <ul class="custom-list" style="list-style-type: square; font-weight: 500;">
+                        <li>Gaddafi Waziri <span class="text-muted">(Chairman)</span></li>
+                        <li>Sadiq Torrex <span class="text-muted">(Secretary)</span></li>
+                        <li>Malam Abdullahi <span class="text-muted">(Publicity)</span></li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="box" style="border-color: #3b82f6;">
-                <h3 style="color: #60a5fa;">General Campaign Mobilization</h3>
-                <p>Public campaign registry framework. PVC documentation strictly required for field mobilization ops.</p>
-                <form action="/register/general" method="POST">
-                    <input type="text" name="full_name" placeholder="Full Name" class="input-field" required>
-                    <input type="text" name="address" placeholder="Residential Address" class="input-field" required>
-                    <input type="text" name="ward" placeholder="Ward Unit Location" class="input-field" required>
-                    <input type="text" name="pvc_number" placeholder="Mandatory PVC Number" class="input-field" required>
-                    <input type="tel" name="phone" placeholder="Phone Number" class="input-field" required>
-                    <input type="email" name="email" placeholder="Email Address" class="input-field" required>
-                    <input type="password" name="password" placeholder="Create Access Password" class="input-field" required>
-                    <button type="submit" class="btn btn-gray" style="background-color: #2563eb;">Join Mobilization Stream</button>
-                </form>
+            <div class="col-md-4">
+                <h3 class="col-title">Citizen Access Portal</h3>
+                
+                <div class="nav-tabs-custom">
+                    <button id="btn-tab-login" class="active" onclick="toggleCenterTab('login')">🔑 LOG IN</button>
+                    <button id="btn-tab-register" onclick="toggleCenterTab('register')">📝 CREATE ACCOUNT</button>
+                </div>
+
+                <div id="panel-login">
+                    <p class="info-text text-muted mb-3">Access your registered mobilization file variables.</p>
+                    <form action="/citizen/login" method="POST">
+                        <label class="small fw-bold text-secondary mb-1">Phone Number</label>
+                        <input type="tel" name="phone" class="form-control form-control-sm" placeholder="e.g. 08030000000" required>
+                        
+                        <label class="small fw-bold text-secondary mb-1">Security Password</label>
+                        <input type="password" name="password" class="form-control form-control-sm" placeholder="••••••••" required>
+                        
+                        <button type="submit" class="btn-gys mt-2">Access Account Ledger</button>
+                    </form>
+                </div>
+
+                <div id="panel-register" style="display: none;">
+                    <div class="sub-toggle">
+                        <button id="btn-stream-gra" class="active" onclick="toggleStream('gra')">GRA Resident</button>
+                        <button id="btn-stream-gen" onclick="toggleStream('gen')">General Campaign</button>
+                    </div>
+
+                    <div id="form-gra-stream">
+                        <form action="/register/tr" method="POST">
+                            <input type="text" name="full_name" class="form-control form-control-sm" placeholder="Full Name" required>
+                            <input type="tel" name="phone" class="form-control form-control-sm" placeholder="Phone Contact" required>
+                            <input type="text" name="ward" class="form-control form-control-sm" placeholder="Area Location (e.g. GRA Bauchi)" required>
+                            <input type="password" name="password" class="form-control form-control-sm" placeholder="Security Password" required>
+                            <button type="submit" class="btn-gys">Submit GRA Registry File</button>
+                        </form>
+                    </div>
+
+                    <div id="form-gen-stream" style="display: none;">
+                        <form action="/register/general" method="POST">
+                            <input type="text" name="full_name" class="form-control form-control-sm" placeholder="Full Name" required>
+                            <input type="tel" name="phone" class="form-control form-control-sm" placeholder="Phone Contact" required>
+                            <input type="text" name="ward" class="form-control form-control-sm" placeholder="Electoral Ward Location" required>
+                            <input type="text" name="pvc_number" class="form-control form-control-sm" placeholder="PVC Number (VIN String)" required>
+                            <input type="password" name="password" class="form-control form-control-sm" placeholder="Security Password" required>
+                            <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold py-2" style="border-radius: 6px;">Register Campaign Profile</button>
+                        </form>
+                    </div>
+                </div>
             </div>
 
-            <div class="box">
-                <h3>Account Portal Access</h3>
-                <p>Authorized login node for successfully verified residents and team members.</p>
-                <form action="/citizen/login" method="POST">
-                    <input type="tel" name="phone" placeholder="Registered Phone Line" class="input-field" required>
-                    <input type="password" name="password" placeholder="Security Password" class="input-field" required>
-                    <button type="submit" class="btn btn-gray">Verify Identity & Enter</button>
-                </form>
+            <div class="col-md-4">
+                <div class="board-terminal">
+                    <h3 class="col-title" style="border-bottom-color: #f0e68c;">Board Terminal Gate</h3>
+                    <p class="info-text text-muted mb-3">Restricted administrative management module. Node authorization entry required.</p>
+                    
+                    <form action="/trustee/login" method="POST">
+                        <label class="small fw-bold text-dark mb-1">Trustee Access Code</label>
+                        <input type="text" name="trustee_code" class="form-control form-control-sm" placeholder="e.g. GYS-BOT-77" style="background: white;" required>
+                        
+                        <label class="small fw-bold text-dark mb-1">Security Passcode</label>
+                        <input type="password" name="password" class="form-control form-control-sm" placeholder="••••••••" style="background: white;" required>
+                        
+                        <button type="submit" class="btn-auth">Authenticate & Launch Terminal</button>
+                    </form>
+                </div>
             </div>
 
-            <div class="box admin">
-                <h3>Board Terminal Gate</h3>
-                <p>Restricted administrative operations terminal access point. Encryption clearance mandatory.</p>
-                <form action="/trustee/login" method="POST">
-                    <input type="text" name="trustee_username" placeholder="Trustee Username ID" class="input-field" style="border-color: #ffd700;" required>
-                    <input type="password" name="authentication_number" placeholder="Authentication Number" class="input-field" style="border-color: #ffd700;" required>
-                    <button type="submit" class="btn btn-gold">Authenticate Terminal</button>
-                </form>
-            </div>
         </div>
     </div>
 
+    <script>
+        function toggleCenterTab(mode) {
+            document.getElementById('btn-tab-login').classList.remove('active');
+            document.getElementById('btn-tab-register').classList.remove('active');
+            document.getElementById('panel-login').style.display = 'none';
+            document.getElementById('panel-register').style.display = 'none';
+
+            if(mode === 'login') {
+                document.getElementById('btn-tab-login').classList.add('active');
+                document.getElementById('panel-login').style.display = 'block';
+            } else {
+                document.getElementById('btn-tab-register').classList.add('active');
+                document.getElementById('panel-register').style.display = 'block';
+            }
+        }
+
+        function toggleStream(stream) {
+            document.getElementById('btn-stream-gra').classList.remove('active');
+            document.getElementById('btn-stream-gen').classList.remove('active');
+            document.getElementById('form-gra-stream').style.display = 'none';
+            document.getElementById('form-gen-stream').style.display = 'none';
+
+            if(stream === 'gra') {
+                document.getElementById('btn-stream-gra').classList.add('active');
+                document.getElementById('form-gra-stream').style.display = 'block';
+            } else {
+                document.getElementById('btn-stream-gen').classList.add('active');
+                document.getElementById('form-gen-stream').style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
