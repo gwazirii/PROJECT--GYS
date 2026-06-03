@@ -28,11 +28,11 @@
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="flash">{{ messages[0] }}</div>
+        <div class="flash">✅ {{ messages[0] }}</div>
       {% endif %}
     {% endwith %}
 
-    <h2>Registered Citizen Database File ({{ citizens|length }} Total)</h2>
+    <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #334155;">Registered Citizen Database File ({{ citizens|length }} Total)</h2>
     <table>
         <thead>
             <tr>
@@ -53,8 +53,20 @@
                 <td>{{ citizen.full_name }}</td>
                 <td>{{ citizen.email }}</td>
                 <td>{{ citizen.phone }}</td>
-                <td>{{ citizen.ward if citizen.ward else citizen.area_name }}</td>
-                <td><code>{{ citizen.pvc_number if citizen.pvc_number else "N/A (TR Profile)" }}</code></td>
+                <td>
+                    {% if citizen.reg_type == 'TR_Citizen' %}
+                        {{ citizen.area_name }}
+                    {% else %}
+                        {{ citizen.ward }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if citizen.pvc_number %}
+                        <code>{{ citizen.pvc_number }}</code>
+                    {% else %}
+                        <span style="color: #94a3b8; font-style: italic;">TR Resident</span>
+                    {% endif %}
+                </td>
                 <td>
                     {% if citizen.approved %}
                         <span class="status-badge status-active">Active</span>
@@ -66,7 +78,7 @@
                     {% if not citizen.approved %}
                         <a href="/admin/approve/{{ citizen.id }}" class="btn-approve">Approve Profile</a>
                     {% else %}
-                        <span style="color: #94a3b8; font-size: 11px;">Validated Verified</span>
+                        <span style="color: #94a3b8; font-size: 11px;">Validated</span>
                     {% endif %}
                 </td>
             </tr>
