@@ -53,20 +53,8 @@
                 <td>{{ citizen.full_name }}</td>
                 <td>{{ citizen.email }}</td>
                 <td>{{ citizen.phone }}</td>
-                <td>
-                    {% if citizen.reg_type == 'TR_Citizen' %}
-                        {{ citizen.area_name }}
-                    {% else %}
-                        {{ citizen.ward }}
-                    {% endif %}
-                </td>
-                <td>
-                    {% if citizen.pvc_number %}
-                        <code>{{ citizen.pvc_number }}</code>
-                    {% else %}
-                        <span style="color: #94a3b8; font-style: italic;">TR Resident (No PVC)</span>
-                    {% endif %}
-                </td>
+                <td>{{ citizen.ward if citizen.ward else citizen.area_name }}</td>
+                <td><code>{{ citizen.pvc_number if citizen.pvc_number else "N/A (TR Profile)" }}</code></td>
                 <td>
                     {% if citizen.approved %}
                         <span class="status-badge status-active">Active</span>

@@ -3,407 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GYS - Community Mobilization Hub</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>GYS - Central Security Gateway</title>
     <style>
-        :root {
-            --brand-blue: #0d3b66;
-            --brand-gold: #f4d35e;
-            --brand-slate: #14274e;
-            --brand-light: #eff6ff;
-            --brand-soft: #f8f0e3;
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at top, rgba(244, 211, 94, 0.12), transparent 35%), #f4f4f9;
-            color: #1f2937;
-        }
-        .topbar {
-            background: linear-gradient(90deg, var(--brand-blue), #224b7a);
-            color: white;
-            padding: 18px 0;
-        }
-        .topbar .brand {
-            font-size: 1.55rem;
-            font-weight: 800;
-            letter-spacing: 0.03em;
-        }
-        .topbar .nav-link {
-            color: rgba(255,255,255,0.88);
-            margin-left: 22px;
-            font-weight: 500;
-        }
-        .hero {
-            padding: 80px 0 50px;
-        }
-        .hero h1 {
-            font-size: clamp(2.8rem, 4vw, 4.5rem);
-            line-height: 1.02;
-            letter-spacing: -0.035em;
-        }
-        .hero p {
-            max-width: 680px;
-            font-size: 1rem;
-            line-height: 1.8;
-            color: #475569;
-        }
-        .hero .hero-buttons .btn {
-            border-radius: 999px;
-            padding: 14px 26px;
-            font-weight: 700;
-        }
-        .hero .hero-buttons .btn-primary {
-            background: var(--brand-gold);
-            border: none;
-            color: #14274e;
-        }
-        .hero .hero-buttons .btn-outline {
-            border: 2px solid rgba(20, 39, 78, 0.15);
-            color: #14274e;
-            background: white;
-        }
-        .hero-visual {
-            background: url('https://images.unsplash.com/photo-1531497865144-046d4b7c36e5?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
-            border-radius: 28px;
-            min-height: 440px;
-            box-shadow: 0 35px 80px rgba(20,39,78,0.14);
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-visual::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(20,39,78,0.12), rgba(20,39,78,0.55));
-        }
-        .hero-visual .hero-panel {
-            position: absolute;
-            bottom: 28px;
-            left: 28px;
-            background: rgba(255,255,255,0.94);
-            border-radius: 18px;
-            max-width: 320px;
-            padding: 24px;
-            box-shadow: 0 18px 40px rgba(20,39,78,0.16);
-        }
-        .hero-visual .hero-panel h5 {
-            margin-bottom: 10px;
-            color: var(--brand-blue);
-            font-weight: 700;
-        }
-        .hero-visual .hero-panel p {
-            margin-bottom: 0;
-            color: #475569;
-            font-size: 0.95rem;
-            line-height: 1.7;
-        }
-        .section {
-            padding: 60px 0;
-        }
-        .section-title {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .section-title h2 {
-            font-size: 2.5rem;
-            margin-bottom: 14px;
-        }
-        .section-title p {
-            color: #475569;
-            max-width: 680px;
-            margin: 0 auto;
-            line-height: 1.8;
-        }
-        .program-card {
-            border-radius: 20px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            padding: 30px;
-            min-height: 320px;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-        .program-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 30px 50px rgba(15,23,42,0.08);
-        }
-        .program-card h5 {
-            font-weight: 700;
-            margin-bottom: 18px;
-            color: var(--brand-blue);
-        }
-        .program-card p {
-            color: #475569;
-            line-height: 1.75;
-        }
-        .card-highlight {
-            border-radius: 24px;
-            background: linear-gradient(135deg, rgba(244,211,94,0.18), rgba(13,59,102,0.09));
-            padding: 30px;
-            border: 1px solid rgba(13,59,102,0.1);
-        }
-        .mission-block {
-            background: white;
-            border-radius: 22px;
-            box-shadow: 0 18px 45px rgba(15,23,42,0.06);
-            padding: 36px;
-        }
-        .mission-block h3 {
-            color: var(--brand-blue);
-            font-weight: 800;
-        }
-        .mission-block p {
-            color: #475569;
-            line-height: 1.85;
-        }
-        .cta-banner {
-            border-radius: 24px;
-            background: var(--brand-blue);
-            color: white;
-            padding: 42px 30px;
-        }
-        .cta-banner h3 {
-            font-size: 2rem;
-            margin-bottom: 16px;
-        }
-        .footer {
-            background: #f8fafc;
-            padding: 40px 0 20px;
-            color: #334155;
-        }
-        .footer .footer-title {
-            color: var(--brand-blue);
-            font-weight: 700;
-        }
-        .footer .footer-link {
-            color: #334155;
-            text-decoration: none;
-        }
-        .footer .footer-link:hover {
-            color: var(--brand-blue);
-        }
-        .form-panel {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 18px 40px rgba(15,23,42,0.08);
-            padding: 30px;
-        }
-        .form-panel h4 {
-            color: var(--brand-blue);
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-        .form-panel p {
-            color: #64748b;
-            margin-bottom: 24px;
-        }
-        .form-control {
-            border-radius: 14px;
-            border: 1px solid #cbd5e1;
-            padding: 14px 18px;
-            margin-bottom: 16px;
-            background: #f8fafc;
-        }
-        .btn-block {
-            width: 100%;
-            border-radius: 999px;
-        }
-        @media (max-width: 992px) {
-            .hero { padding-top: 60px; }
-            .hero-visual { min-height: 360px; }
-            .section { padding: 40px 0; }
-        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #0f172a; color: white; margin: 0; padding: 20px; box-sizing: border-box; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .gate-card { width: 100%; max-width: 1200px; background: rgba(255, 255, 255, 0.02); border: 2px solid #228b22; border-radius: 16px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #228b22; padding-bottom: 20px; }
+        .header h1 { color: #ffd700; margin: 0; font-size: 26px; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .box { background: rgba(255, 255, 255, 0.04); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .box.admin { border-color: #ffd700; background: rgba(253, 216, 53, 0.01); }
+        h3 { color: #ffd700; margin-top: 0; font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; text-transform: uppercase; }
+        p { font-size: 11px; color: #94a3b8; margin: 5px 0 15px 0; min-height: 32px; }
+        .input-field { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 13px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 11px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-green { background: #228b22; color: white; }
+        .btn-gray { background: #475569; color: white; }
+        .btn-gold { background: #ffd700; color: #0f172a; }
+        .flash { background: #fef08a; color: #854d0e; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 13px; }
     </style>
 </head>
 <body>
-    <header class="topbar">
-        <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-            <div class="brand">GYS Foundation</div>
-            <nav class="d-flex align-items-center flex-wrap">
-                <a class="nav-link" href="#about">About</a>
-                <a class="nav-link" href="#programs">Programs</a>
-                <a class="nav-link" href="#mission">Mission</a>
-                <a class="nav-link" href="#contact">Contact</a>
-            </nav>
+
+    <div class="gate-card">
+        <div class="header">
+            <h1>🔒 GYS Platform Operations Control</h1>
+            <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 13px;">Secure identification mapping for regional area residents and campaign mobilization units.</p>
         </div>
-    </header>
 
-    <main>
-        <section class="container hero">
-            <div class="row align-items-center gx-5">
-                <div class="col-lg-6">
-                    <span class="badge rounded-pill bg-warning text-dark mb-3">Community Mobilization</span>
-                    <h1>Empowering Citizens through Secure Registration and Trustee-led Governance</h1>
-                    <p>GYS is building a trusted community command center for registration, verification, and board approval. Our secure board terminal flow ensures only authorized leadership can access the command dashboard.</p>
-                    <div class="hero-buttons d-flex flex-wrap gap-3 mt-4">
-                        <a href="#forms" class="btn btn-primary">Enter Board Terminal</a>
-                        <a href="#programs" class="btn btn-outline">Explore Programs</a>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="hero-visual">
-                        <div class="hero-panel">
-                            <h5>Trusted by the Community</h5>
-                            <p>Secure access, verified registries, and governance-ready trustees working together for safer neighborhood engagement.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
 
-        <section id="forms" class="section">
-            <div class="container">
-                <div class="section-title">
-                    <h2>Access & Registration</h2>
-                    <p>Choose the path that fits your role: citizen registration, resident login, or trustee board terminal authentication.</p>
-                </div>
-                <div class="row g-4">
-                    <div class="col-lg-4">
-                        <div class="form-panel">
-                            <h4>Create Resident Account</h4>
-                            <p>Register as a GRA resident with verified housing details and contact information.</p>
-                            <form action="/register/tr" method="POST">
-                                <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
-                                <input type="text" name="area_name" class="form-control" placeholder="Area Name" required>
-                                <input type="text" name="house_number" class="form-control" placeholder="House Number" required>
-                                <input type="email" name="email" class="form-control" placeholder="Email Address" required>
-                                <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
-                                <input type="password" name="password" class="form-control" placeholder="Password" required>
-                                <button type="submit" class="btn btn-primary btn-block mt-2">Create GRA Account</button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-panel">
-                            <h4>General Mobilization</h4>
-                            <p>Apply for a mobilization profile so you can join the verified network and participate in community programs.</p>
-                            <form action="/register/general" method="POST">
-                                <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
-                                <input type="text" name="ward" class="form-control" placeholder="Ward Name" required>
-                                <input type="text" name="pvc_number" class="form-control" placeholder="PVC Number" required>
-                                <input type="text" name="address" class="form-control" placeholder="Address" required>
-                                <input type="email" name="email" class="form-control" placeholder="Email Address" required>
-                                <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
-                                <input type="password" name="password" class="form-control" placeholder="Password" required>
-                                <button type="submit" class="btn btn-primary btn-block mt-2">Register Mobilization</button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-panel">
-                            <h4>Trustee Board Terminal</h4>
-                            <p>Only trustees may access the board command center. Authenticate securely to continue.</p>
-                            <form action="/trustee/login" method="POST">
-                                <input type="text" name="trustee_username" class="form-control" placeholder="Trustee Username" required>
-                                <input type="password" name="authentication_number" class="form-control" placeholder="Authentication Number" required>
-                                <button type="submit" class="btn btn-primary btn-block mt-2">Authenticate Now</button>
-                            </form>
-                            <hr>
-                            <p class="small text-muted">Already registered as a resident? Use the account portal below.</p>
-                            <form action="/citizen/login" method="POST">
-                                <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
-                                <input type="password" name="password" class="form-control" placeholder="Password" required>
-                                <button type="submit" class="btn btn-outline btn-block mt-2">Resident Login</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+        <div class="grid">
+            <div class="box">
+                <h3>TR Resident Secure Registry</h3>
+                <p>Exclusive portal for core TR area residents. Requires administration validation check.</p>
+                <form action="/register/tr" method="POST">
+                    <input type="text" name="full_name" placeholder="Full Name" class="input-field" required>
+                    <input type="text" name="area_name" placeholder="Your Area Name" class="input-field" required>
+                    <input type="text" name="house_number" placeholder="House Number" class="input-field" required>
+                    <input type="tel" name="phone" placeholder="Phone Line Contact" class="input-field" required>
+                    <input type="email" name="email" placeholder="Email Address" class="input-field" required>
+                    <input type="password" name="password" placeholder="Establish Secret Password" class="input-field" required>
+                    <button type="submit" class="btn btn-green">Submit Registry File</button>
+                </form>
             </div>
-        </section>
 
-        <section id="programs" class="section">
-            <div class="container">
-                <div class="section-title">
-                    <h2>What We Do</h2>
-                    <p>Our platform supports community registration, verification, and board-led authorization, combined with outreach programs tailored to local needs.</p>
-                </div>
-                <div class="row g-4">
-                    <div class="col-md-6 col-xl-3">
-                        <div class="program-card">
-                            <h5>Registration & Verification</h5>
-                            <p>Secure citizen and resident registration with verified documentation and centralized recordkeeping.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-3">
-                        <div class="program-card">
-                            <h5>Board Terminal Access</h5>
-                            <p>Dedicated trustee authentication gateway that protects the command dashboard and synchronizes node access.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-3">
-                        <div class="program-card">
-                            <h5>Community Mobilization</h5>
-                            <p>Support for general mobilization profiles that help coordinate local outreach and civic engagement.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-3">
-                        <div class="program-card">
-                            <h5>Secure Dashboard Oversight</h5>
-                            <p>Board-approved access to the trustee command center with real-time registry review.</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="box" style="border-color: #3b82f6;">
+                <h3 style="color: #60a5fa;">General Campaign Mobilization</h3>
+                <p>Public campaign registry framework. PVC documentation strictly required for field mobilization ops.</p>
+                <form action="/register/general" method="POST">
+                    <input type="text" name="full_name" placeholder="Full Name" class="input-field" required>
+                    <input type="text" name="address" placeholder="Residential Address" class="input-field" required>
+                    <input type="text" name="ward" placeholder="Ward Unit Location" class="input-field" required>
+                    <input type="text" name="pvc_number" placeholder="Mandatory PVC Number" class="input-field" required>
+                    <input type="tel" name="phone" placeholder="Phone Number" class="input-field" required>
+                    <input type="email" name="email" placeholder="Email Address" class="input-field" required>
+                    <input type="password" name="password" placeholder="Create Access Password" class="input-field" required>
+                    <button type="submit" class="btn btn-gray" style="background-color: #2563eb;">Join Mobilization Stream</button>
+                </form>
             </div>
-        </section>
 
-        <section id="mission" class="section bg-light">
-            <div class="container">
-                <div class="row align-items-center gy-4">
-                    <div class="col-lg-6">
-                        <div class="mission-block">
-                            <h3>Our Mission</h3>
-                            <p>To empower secure community participation through trusted registration, transparent trustee governance, and synchronized access to the board command infrastructure.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mission-block">
-                            <h3>Our Vision</h3>
-                            <p>To build a resilient community platform where citizens and trustees collaborate in a transparent, verified, and secure digital environment.</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="box">
+                <h3>Account Portal Access</h3>
+                <p>Authorized login node for successfully verified residents and team members.</p>
+                <form action="/citizen/login" method="POST">
+                    <input type="tel" name="phone" placeholder="Registered Phone Line" class="input-field" required>
+                    <input type="password" name="password" placeholder="Security Password" class="input-field" required>
+                    <button type="submit" class="btn btn-gray">Verify Identity & Enter</button>
+                </form>
             </div>
-        </section>
 
-        <section class="section">
-            <div class="container">
-                <div class="cta-banner text-center">
-                    <h3>Every Member Counts</h3>
-                    <p class="mb-4">Join the GYS network for secure community registration, board-led access, and trusted governance.</p>
-                    <a href="#forms" class="btn btn-light btn-lg text-dark btn-block">Start Your Access Journey</a>
-                </div>
+            <div class="box admin">
+                <h3>Board Terminal Gate</h3>
+                <p>Restricted administrative operations terminal access point. Encryption clearance mandatory.</p>
+                <form action="/trustee/login" method="POST">
+                    <input type="text" name="trustee_username" placeholder="Trustee Username ID" class="input-field" style="border-color: #ffd700;" required>
+                    <input type="password" name="authentication_number" placeholder="Authentication Number" class="input-field" style="border-color: #ffd700;" required>
+                    <button type="submit" class="btn btn-gold">Authenticate Terminal</button>
+                </form>
             </div>
-        </section>
-    </main>
-
-    <footer id="contact" class="footer">
-        <div class="container">
-            <div class="row gy-4">
-                <div class="col-md-4">
-                    <h5 class="footer-title">GYS Foundation</h5>
-                    <p>Secure registration and trustee access for the GRA youth community. Designed for clarity, oversight, and trusted participation.</p>
-                </div>
-                <div class="col-md-4">
-                    <h6 class="footer-title">Contact</h6>
-                    <p class="mb-1">Email: info@gysfoundation.example</p>
-                    <p class="mb-1">Phone: +234 700 731 0000</p>
-                    <p class="mb-0">Location: Bauchi, Nigeria</p>
-                </div>
-                <div class="col-md-4">
-                    <h6 class="footer-title">Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li><a class="footer-link" href="#about">About Us</a></li>
-                        <li><a class="footer-link" href="#programs">Programs</a></li>
-                        <li><a class="footer-link" href="#mission">Mission</a></li>
-                        <li><a class="footer-link" href="#forms">Board Terminal</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="text-center mt-4 small">© 2026 GYS Foundation. All rights reserved.</div>
         </div>
-    </footer>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
