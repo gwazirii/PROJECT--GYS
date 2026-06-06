@@ -121,7 +121,7 @@
                             </td>
                             <td>
                                 {% if not citizen.approved %}
-                                    <a href="/admin/approve/{{ citizen.id }}" class="btn-approve">Authorize</a>
+                                    <a href="{{ url_for('approve_citizen', citizen_id=citizen.id) }}" class="btn-approve">Authorize</a>
                                 {% else %}
                                     <span class="text-muted small">Verified</span>
                                 {% endif %}

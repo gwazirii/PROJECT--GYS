@@ -21,7 +21,7 @@
 <body>
 
     <div class="header">
-        <a href="/logout" class="btn-exit">Close Terminal</a>
+        <a href="{{ url_for('logout') }}" class="btn-exit">Close Terminal</a>
         <h1>GYS Board Command Central</h1>
         <p style="margin: 5px 0 0 0; font-size: 13px; color: #94a3b8;">Official secure database registry mapping confirmed residents.</p>
     </div>
@@ -76,7 +76,7 @@
                 </td>
                 <td>
                     {% if not citizen.approved %}
-                        <a href="/admin/approve/{{ citizen.id }}" class="btn-approve">Approve Profile</a>
+                        <a href="{{ url_for('approve_citizen', citizen_id=citizen.id) }}" class="btn-approve">Approve Profile</a>
                     {% else %}
                         <span style="color: #94a3b8; font-size: 11px;">Validated</span>
                     {% endif %}

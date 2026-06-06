@@ -224,6 +224,198 @@
             padding: 12px 14px;
             text-align: center;
         }
+
+        /* ── Portal Zone ─────────────────────────────────────────── */
+        #portal-zone {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* Three-tab row */
+        .pz-tabs {
+            display: flex;
+            gap: 3px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .pz-tab {
+            flex: 1;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            padding: 9px 6px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+            white-space: nowrap;
+        }
+
+        .pz-tab.active {
+            background: #ffffff;
+            color: var(--gys-green);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+        }
+
+        /* Panel visibility */
+        .pz-panel { display: none; flex: 1; }
+        .pz-panel.active { display: flex; flex-direction: column; }
+
+        /* Shared form card shell */
+        .reg-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .reg-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--gys-line);
+        }
+
+        .reg-card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .reg-card-icon.green  { background: #dcfce7; color: var(--gys-green); }
+        .reg-card-icon.amber  { background: #fef9c3; color: #92400e; }
+
+        .reg-card-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--gys-ink);
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .reg-card-sub {
+            font-size: 0.72rem;
+            color: var(--gys-muted);
+            margin: 0;
+        }
+
+        /* Two-column field grid inside a form */
+        .fields-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            flex: 1;
+        }
+
+        .fields-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .fields-row .field-group { flex: 1; min-width: 0; }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field-group .form-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin: 0;
+        }
+
+        .field-group .form-control,
+        .field-group .form-select {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: var(--gys-ink);
+            font-size: 0.84rem;
+            padding: 9px 11px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .field-group .form-control:focus,
+        .field-group .form-select:focus {
+            border-color: var(--gys-green);
+            box-shadow: 0 0 0 3px rgba(34, 139, 34, 0.12);
+            outline: none;
+        }
+
+        /* ID upload field */
+        .field-group input[type="file"].form-control {
+            padding: 6px 11px;
+            cursor: pointer;
+        }
+
+        /* Divider hint between form sections */
+        .fields-divider {
+            border: 0;
+            border-top: 1px dashed #e2e8f0;
+            margin: 4px 0;
+        }
+
+        /* Submit button variants */
+        .btn-register-citizen {
+            width: 100%;
+            border: 0;
+            border-radius: 6px;
+            background: var(--gys-green);
+            color: #fff;
+            font-size: 0.84rem;
+            font-weight: 800;
+            padding: 11px 14px;
+            margin-top: 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+
+        .btn-register-citizen:hover { background: var(--gys-green-dark); }
+
+        .btn-register-campaign {
+            width: 100%;
+            border: 0;
+            border-radius: 6px;
+            background: #92400e;
+            color: #fff;
+            font-size: 0.84rem;
+            font-weight: 800;
+            padding: 11px 14px;
+            margin-top: 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+
+        .btn-register-campaign:hover { background: #78350f; }
+
+        /* Sign-in panel login form keeps existing .btn-gys */
+        .signin-intro {
+            font-size: 0.84rem;
+            color: var(--gys-muted);
+            margin-bottom: 16px;
+        }
     </style>
 </head>
 <body>
@@ -262,63 +454,307 @@
             </aside>
 
             <section class="col-lg-4">
-                <div class="portal-panel">
-                    <h2 class="section-title">Citizen Access Portal</h2>
+                <div class="portal-panel" id="portal-zone">
 
-                    <div class="tab-switch">
-                        <button type="button" id="btn-tab-login" class="active" onclick="toggleCenterTab('login')">LOG IN</button>
-                        <button type="button" id="btn-tab-register" onclick="toggleCenterTab('register')">REGISTER</button>
+                    <h2 class="section-title">Member Registration &amp; Sign In</h2>
+
+                    <!-- ── Tab row ──────────────────────────────────────── -->
+                    <div class="pz-tabs" role="tablist" aria-label="Portal sections">
+                        <button type="button"
+                                class="pz-tab active"
+                                id="tab-signin"
+                                role="tab"
+                                aria-controls="pz-signin"
+                                aria-selected="true"
+                                onclick="switchPortalTab('signin')">
+                            Sign In
+                        </button>
+                        <button type="button"
+                                class="pz-tab"
+                                id="tab-citizen"
+                                role="tab"
+                                aria-controls="pz-citizen"
+                                aria-selected="false"
+                                onclick="switchPortalTab('citizen')">
+                            GRA Citizen
+                        </button>
+                        <button type="button"
+                                class="pz-tab"
+                                id="tab-campaign"
+                                role="tab"
+                                aria-controls="pz-campaign"
+                                aria-selected="false"
+                                onclick="switchPortalTab('campaign')">
+                            Campaign
+                        </button>
                     </div>
 
-                    <div id="panel-login">
-                        <div class="access-panel">
-                            <p class="body-copy access-copy">Access your approved registration profile.</p>
-                            <form action="/citizen/login" method="POST" class="access-form">
-                                <div class="form-grid">
-                                    <div class="field-group">
-                                        <label class="form-label">Phone Number</label>
-                                        <input type="tel" name="phone" class="form-control" placeholder="08030000000" required>
-                                    </div>
-                                    <div class="field-group">
-                                        <label class="form-label">Password</label>
-                                        <input type="password" name="password" class="form-control" placeholder="Password" required>
-                                    </div>
+                    <!-- ── Panel A: Sign In ─────────────────────────────── -->
+                    <div class="pz-panel active"
+                         id="pz-signin"
+                         role="tabpanel"
+                         aria-labelledby="tab-signin">
+
+                        <div class="reg-card">
+                            <div class="reg-card-header">
+                                <div class="reg-card-icon green">🔑</div>
+                                <div>
+                                    <p class="reg-card-title">Member Sign In</p>
+                                    <p class="reg-card-sub">Access your approved registration profile</p>
                                 </div>
-                                <button type="submit" class="btn-gys">Access Account</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div id="panel-register" style="display: none;">
-                        <div class="access-panel">
-                            <div class="stream-switch">
-                                <button type="button" id="btn-stream-tr" class="active" onclick="toggleStream('tr')">TR Citizen</button>
-                                <button type="button" id="btn-stream-general" onclick="toggleStream('general')">General</button>
                             </div>
 
-                            <form id="form-tr-stream" action="/register/tr" method="POST" class="access-form">
-                                <div class="form-grid">
-                                    <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
-                                    <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
-                                    <input type="text" name="ward" class="form-control" placeholder="Ward or Area" required>
-                                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                            <p class="signin-intro">
+                                Enter the phone number and password you registered with to access
+                                your GYS member portal.
+                            </p>
+
+                            <form action="/citizen/login" method="POST" class="fields-grid">
+                                <div class="field-group">
+                                    <label class="form-label" for="si-phone">Phone Number</label>
+                                    <input type="tel"
+                                           id="si-phone"
+                                           name="phone"
+                                           class="form-control"
+                                           placeholder="e.g. 08030000000"
+                                           autocomplete="tel"
+                                           required>
                                 </div>
-                                <button type="submit" class="btn-gys">Submit TR Citizen Registration</button>
+
+                                <div class="field-group">
+                                    <label class="form-label" for="si-password">Password</label>
+                                    <input type="password"
+                                           id="si-password"
+                                           name="password"
+                                           class="form-control"
+                                           placeholder="Your password"
+                                           autocomplete="current-password"
+                                           required>
+                                </div>
+
+                                <button type="submit" class="btn-gys">Access Account</button>
                             </form>
 
-                            <form id="form-general-stream" action="/register/general" method="POST" class="access-form" style="display: none;">
-                                <div class="form-grid">
-                                    <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
-                                    <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
-                                    <input type="text" name="ward" class="form-control" placeholder="Ward" required>
-                                    <input type="text" name="pvc_number" class="form-control" placeholder="PVC Number" required>
-                                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                            <p class="body-copy text-center mt-3" style="font-size:0.78rem;">
+                                Not registered yet?
+                                <button type="button"
+                                        onclick="switchPortalTab('citizen')"
+                                        style="background:none;border:0;color:var(--gys-green);font-weight:800;cursor:pointer;padding:0;font-size:inherit;">
+                                    Register as GRA Citizen
+                                </button>
+                                or
+                                <button type="button"
+                                        onclick="switchPortalTab('campaign')"
+                                        style="background:none;border:0;color:#92400e;font-weight:800;cursor:pointer;padding:0;font-size:inherit;">
+                                    Join the Campaign
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ── Panel B: GRA Citizen Registry ───────────────── -->
+                    <div class="pz-panel"
+                         id="pz-citizen"
+                         role="tabpanel"
+                         aria-labelledby="tab-citizen">
+
+                        <div class="reg-card">
+                            <div class="reg-card-header">
+                                <div class="reg-card-icon green">🏠</div>
+                                <div>
+                                    <p class="reg-card-title">GRA Citizen Registry</p>
+                                    <p class="reg-card-sub">Form A — GRA resident registration</p>
                                 </div>
-                                <button type="submit" class="btn-gys">Submit General Registration</button>
+                            </div>
+
+                            <form action="/citizen/register" method="POST"
+                                  enctype="multipart/form-data"
+                                  class="fields-grid">
+
+                                <!-- Row 1: Full Name (full width) -->
+                                <div class="field-group">
+                                    <label class="form-label" for="gra-name">Full Name</label>
+                                    <input type="text"
+                                           id="gra-name"
+                                           name="full_name"
+                                           class="form-control"
+                                           placeholder="As on your ID document"
+                                           autocomplete="name"
+                                           required>
+                                </div>
+
+                                <!-- Row 2: Street / House Number + Phone -->
+                                <div class="fields-row">
+                                    <div class="field-group">
+                                        <label class="form-label" for="gra-house">Street / House No.</label>
+                                        <input type="text"
+                                               id="gra-house"
+                                               name="house_number"
+                                               class="form-control"
+                                               placeholder="e.g. 12 Ahmadu Bello Way"
+                                               required>
+                                    </div>
+                                    <div class="field-group">
+                                        <label class="form-label" for="gra-phone">Phone Line</label>
+                                        <input type="tel"
+                                               id="gra-phone"
+                                               name="phone"
+                                               class="form-control"
+                                               placeholder="08030000000"
+                                               autocomplete="tel"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: Email ID (full width) -->
+                                <div class="field-group">
+                                    <label class="form-label" for="gra-email">Email ID</label>
+                                    <input type="email"
+                                           id="gra-email"
+                                           name="email"
+                                           class="form-control"
+                                           placeholder="yourname@example.com"
+                                           autocomplete="email">
+                                </div>
+
+                                <hr class="fields-divider">
+
+                                <!-- Row 4: ID Upload -->
+                                <div class="field-group">
+                                    <label class="form-label" for="gra-id-upload">
+                                        ID Upload
+                                        <span style="color:var(--gys-muted);font-weight:400;text-transform:none;">
+                                            — NIN slip, Voter card, or Driver's licence (JPG/PNG/PDF)
+                                        </span>
+                                    </label>
+                                    <input type="file"
+                                           id="gra-id-upload"
+                                           name="id_document"
+                                           class="form-control"
+                                           accept=".jpg,.jpeg,.png,.pdf"
+                                           aria-describedby="gra-id-hint">
+                                    <span id="gra-id-hint"
+                                          style="font-size:0.72rem;color:var(--gys-muted);">
+                                        Max 5 MB. Optional but speeds up board verification.
+                                    </span>
+                                </div>
+
+                                <!-- Row 5: Password (full width) -->
+                                <div class="field-group">
+                                    <label class="form-label" for="gra-password">Password</label>
+                                    <input type="password"
+                                           id="gra-password"
+                                           name="password"
+                                           class="form-control"
+                                           placeholder="Create a strong password"
+                                           autocomplete="new-password"
+                                           required>
+                                </div>
+
+                                <button type="submit" class="btn-register-citizen">
+                                    Submit GRA Citizen Registration
+                                </button>
                             </form>
                         </div>
                     </div>
-                </div>
+
+                    <!-- ── Panel C: Campaign Mobilization Enrollment ────── -->
+                    <div class="pz-panel"
+                         id="pz-campaign"
+                         role="tabpanel"
+                         aria-labelledby="tab-campaign">
+
+                        <div class="reg-card">
+                            <div class="reg-card-header">
+                                <div class="reg-card-icon amber">📣</div>
+                                <div>
+                                    <p class="reg-card-title">Campaign Mobilization Enrollment</p>
+                                    <p class="reg-card-sub">Form B — Mobilization officer registration</p>
+                                </div>
+                            </div>
+
+                            <form action="/mobilization/register" method="POST"
+                                  class="fields-grid">
+
+                                <!-- Row 1: Full Name (full width) -->
+                                <div class="field-group">
+                                    <label class="form-label" for="mob-name">Full Name</label>
+                                    <input type="text"
+                                           id="mob-name"
+                                           name="full_name"
+                                           class="form-control"
+                                           placeholder="Mobilization officer's full name"
+                                           autocomplete="name"
+                                           required>
+                                </div>
+
+                                <!-- Row 2: LGA + Ward -->
+                                <div class="fields-row">
+                                    <div class="field-group">
+                                        <label class="form-label" for="mob-lga">LGA</label>
+                                        <input type="text"
+                                               id="mob-lga"
+                                               name="lga"
+                                               class="form-control"
+                                               placeholder="Local Government Area"
+                                               required>
+                                    </div>
+                                    <div class="field-group">
+                                        <label class="form-label" for="mob-ward">Ward Address</label>
+                                        <input type="text"
+                                               id="mob-ward"
+                                               name="ward"
+                                               class="form-control"
+                                               placeholder="Ward name"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: PVC Number (full width) -->
+                                <div class="field-group">
+                                    <label class="form-label" for="mob-pvc">PVC Number</label>
+                                    <input type="text"
+                                           id="mob-pvc"
+                                           name="pvc_number"
+                                           class="form-control"
+                                           placeholder="Permanent Voter Card number"
+                                           required>
+                                </div>
+
+                                <!-- Row 4: Phone (full width) -->
+                                <div class="field-group">
+                                    <label class="form-label" for="mob-phone">Phone Line</label>
+                                    <input type="tel"
+                                           id="mob-phone"
+                                           name="phone"
+                                           class="form-control"
+                                           placeholder="08030000000"
+                                           autocomplete="tel"
+                                           required>
+                                </div>
+
+                                <hr class="fields-divider">
+
+                                <!-- Row 5: Password -->
+                                <div class="field-group">
+                                    <label class="form-label" for="mob-password">Password</label>
+                                    <input type="password"
+                                           id="mob-password"
+                                           name="password"
+                                           class="form-control"
+                                           placeholder="Create a strong password"
+                                           autocomplete="new-password"
+                                           required>
+                                </div>
+
+                                <button type="submit" class="btn-register-campaign">
+                                    Submit Campaign Enrollment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div><!-- /#portal-zone -->
             </section>
 
             <aside class="col-lg-4">
@@ -329,7 +765,7 @@
                     <form action="/trustee/login" method="POST">
                         <div class="mb-3">
                             <label class="form-label">Trustee Access Code</label>
-                            <input type="text" name="trustee_code" class="form-control bg-white" placeholder="GYS-BOT-77" required>
+                            <input type="text" name="trustee_code" class="form-control bg-white" placeholder="Enter access code" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Security Passcode</label>
@@ -343,19 +779,38 @@
     </main>
 
     <script>
-        function toggleCenterTab(mode) {
-            document.getElementById('btn-tab-login').classList.toggle('active', mode === 'login');
-            document.getElementById('btn-tab-register').classList.toggle('active', mode === 'register');
-            document.getElementById('panel-login').style.display = mode === 'login' ? 'block' : 'none';
-            document.getElementById('panel-register').style.display = mode === 'register' ? 'block' : 'none';
+        /**
+         * switchPortalTab(id)
+         * Activates the matching .pz-tab button and .pz-panel block
+         * inside #portal-zone.  Safe to call from inline onclick or
+         * external links anywhere on the page.
+         *
+         * @param {string} id  - one of 'signin' | 'citizen' | 'campaign'
+         */
+        function switchPortalTab(id) {
+            // Update tab buttons
+            document.querySelectorAll('.pz-tab').forEach(function(btn) {
+                var isTarget = btn.id === 'tab-' + id;
+                btn.classList.toggle('active', isTarget);
+                btn.setAttribute('aria-selected', isTarget ? 'true' : 'false');
+            });
+
+            // Update panels
+            document.querySelectorAll('.pz-panel').forEach(function(panel) {
+                var isTarget = panel.id === 'pz-' + id;
+                panel.classList.toggle('active', isTarget);
+            });
         }
 
-        function toggleStream(stream) {
-            document.getElementById('btn-stream-tr').classList.toggle('active', stream === 'tr');
-            document.getElementById('btn-stream-general').classList.toggle('active', stream === 'general');
-            document.getElementById('form-tr-stream').style.display = stream === 'tr' ? 'block' : 'none';
-            document.getElementById('form-general-stream').style.display = stream === 'general' ? 'block' : 'none';
-        }
+        // On load: honour a ?tab= query parameter so external links can
+        // deep-link directly to a specific registration form.
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var tab = params.get('tab');
+            if (tab && ['signin', 'citizen', 'campaign'].includes(tab)) {
+                switchPortalTab(tab);
+            }
+        })();
     </script>
 </body>
 </html>
