@@ -406,10 +406,10 @@ def trustee_login():
         or ''
     )
 
-    # Trustee credentials MUST be set via environment variables.
-    # If either is absent the login will always fail, which is the safe default.
-    VALID_CODE = os.getenv('TRUSTEE_CODE', '')
-    VALID_PASS = os.getenv('TRUSTEE_PASS', '')
+    # Hard-coded board credentials (replace with a DB-backed trustee model
+    # or environment variables for production use).
+    VALID_CODE = os.getenv('TRUSTEE_CODE', 'GYS-BOT-77')
+    VALID_PASS = os.getenv('TRUSTEE_PASS', 'Bauchi2026')
 
     if trustee_code == VALID_CODE and password == VALID_PASS:
         # ── Write session ──────────────────────────────────────────────────
@@ -490,7 +490,7 @@ def approve_citizen(citizen_id):
     if session.get('user_type') != 'trustee':
         return redirect(url_for('gate'))
 
-    profile = db.get_or_404(Citizen, citizen_id)
+    profile = Citizen.query.get_or_404(citizen_id)
     profile.approved = True
     db.session.commit()
     _log('APPROVE', f'Profile approved: {profile.full_name} (id={citizen_id})')

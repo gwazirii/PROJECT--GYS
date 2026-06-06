@@ -6,7 +6,6 @@
 # Local Database Files
 instance/
 gys_registry.db
-*.db
 
 # Python Caches & Build Files
 __pycache__/

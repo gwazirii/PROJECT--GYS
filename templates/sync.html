@@ -155,7 +155,6 @@
 
         let progress = 0;
         let checkpointIndex = 0;
-        const dashboardUrl = "{{ url_for('admin_dashboard') }}";
 
         const timer = setInterval(() => {
             progress += 2;
@@ -172,7 +171,7 @@
             if (progress >= 100) {
                 clearInterval(timer);
                 setTimeout(() => {
-                    window.location.href = dashboardUrl;
+                    window.location.href = '/admin/dashboard';
                 }, 900);
             }
         }, 80);
