@@ -3,10 +3,10 @@
 import sys
 from pathlib import Path
 
-# Add backend directory to Python path
+# Make the backend directory importable for Gunicorn
 sys.path.insert(0, str(Path(__file__).parent / "backend"))
 
-from wsgi import application  # noqa: F401
+from app import application  # noqa: F401
 
 # Export for gunicorn
 __all__ = ["application"]
