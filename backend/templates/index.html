@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYS 2027 Campaign</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f7f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar-gys { background-color: #ffffff; border-bottom: 3px solid #2e7d32; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .nav-brand-text { font-weight: 800; color: #2e7d32; letter-spacing: 1px; }
+        .portal-header { background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; padding: 40px 0; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .card-custom { border: none; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background-color: white; height: 100%; }
+        .card-header-gys { background-color: #e8f5e9; border-bottom: 2px solid #a5d6a7; color: #1b5e20; font-weight: 700; border-top-left-radius: 10px; border-top-right-radius: 10px; }
+        .btn-gys { background-color: #2e7d32; color: white; font-weight: 600; transition: 0.3s; }
+        .btn-gys:hover { background-color: #1b5e20; color: white; }
+        .badge-trustee { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; font-weight: 700; }
+        .table-responsive { max-height: 500px; overflow-y: auto; }
+
+        /* ── Citizen Social Layout ──────────────────────────────── */
+
+        /* Wrapper that sits inside col-lg-8 and breaks into sidebar + main */
+        .citizen-shell {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        /* ── Left profile sidebar ───────────────────────────────── */
+        .profile-sidebar {
+            width: 210px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .profile-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .profile-cover {
+            height: 60px;
+            background: linear-gradient(135deg, #1b5e20, #43a047);
+        }
+
+        .profile-avatar-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: -32px;
+            margin-bottom: 8px;
+        }
+
+        .profile-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            object-fit: cover;
+            background: #e8f5e9;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .profile-avatar-placeholder {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            background: linear-gradient(135deg, #a5d6a7, #2e7d32);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.6rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .profile-name {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: #0f172a;
+            text-align: center;
+            padding: 0 12px 2px;
+            line-height: 1.3;
+        }
+
+        .profile-handle {
+            font-size: 0.72rem;
+            color: #64748b;
+            text-align: center;
+            padding: 0 12px 12px;
+        }
+
+        .profile-detail-block {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 14px;
+        }
+
+        .profile-detail-block h6 {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #2e7d32;
+            margin: 0 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e8f5e9;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .detail-row:last-child { margin-bottom: 0; }
+
+        .detail-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .detail-label {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-size: 0.78rem;
+            color: #334155;
+            line-height: 1.35;
+        }
+
+        /* ── Right content area ─────────────────────────────────── */
+        .citizen-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Tab nav */
+        .cz-tab-nav {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            display: flex;
+            gap: 2px;
+            padding: 6px;
+            flex-wrap: wrap;
+        }
+
+        .cz-tab-btn {
+            flex: 1;
+            min-width: 80px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: #64748b;
+            font-size: 0.73rem;
+            font-weight: 800;
+            padding: 9px 8px;
+            cursor: pointer;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            transition: background 0.15s, color 0.15s;
+            white-space: nowrap;
+        }
+
+        .cz-tab-btn .tab-icon { display: block; font-size: 1rem; margin-bottom: 3px; }
+
+        .cz-tab-btn.active {
+            background: #e8f5e9;
+            color: #1b5e20;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        }
+
+        .cz-tab-btn:hover:not(.active) { background: #f1f5f9; color: #334155; }
+
+        /* Tab panels */
+        .cz-panel { display: none; }
+        .cz-panel.active { display: block; }
+
+        /* Shared content card */
+        .cz-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .cz-card-header {
+            padding: 14px 18px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .cz-card-header h5 {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .cz-card-body { padding: 16px 18px; }
+
+        /* Chat room panel */
+        .chat-feed {
+            height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+            padding-right: 4px;
+        }
+
+        .chat-bubble {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .chat-bubble.own { flex-direction: row-reverse; }
+
+        .bubble-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e8f5e9;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .bubble-own { background: #dbeafe; color: #1e40af; }
+
+        .bubble-text {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px 10px 10px 2px;
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            color: #334155;
+            max-width: 78%;
+        }
+
+        .chat-bubble.own .bubble-text {
+            background: #e8f5e9;
+            border-color: #a5d6a7;
+            border-radius: 10px 10px 2px 10px;
+            color: #1b5e20;
+        }
+
+        .bubble-meta {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            margin-top: 3px;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input-row input {
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 0.82rem;
+            background: #f8fafc;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .chat-input-row input:focus { border-color: #2e7d32; }
+
+        .btn-send {
+            background: #2e7d32;
+            color: #fff;
+            border: 0;
+            border-radius: 20px;
+            padding: 8px 18px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-send:hover { background: #1b5e20; }
+
+        /* Broadcast panel */
+        .broadcast-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .broadcast-item:last-child { border-bottom: 0; padding-bottom: 0; }
+
+        .broadcast-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2e7d32;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .broadcast-title {
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 3px;
+        }
+
+        .broadcast-body {
+            font-size: 0.78rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .broadcast-time {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        /* Gallery panel */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .gallery-cell {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.72rem;
+            text-align: center;
+            overflow: hidden;
+            border: 1px dashed #cbd5e1;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        .gallery-cell:hover { border-color: #2e7d32; color: #2e7d32; }
+        .gallery-cell img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Reels panel */
+        .reels-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .reel-card {
+            background: #0f172a;
+            border-radius: 10px;
+            aspect-ratio: 9/16;
+            max-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: 1px dashed #334155;
+            transition: border-color 0.15s;
+        }
+
+        .reel-card:hover { border-color: #2e7d32; color: #a5d6a7; }
+        .reel-card .reel-play { font-size: 2rem; color: #64748b; }
+
+        /* CV Uploads panel */
+        .cv-upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 32px 20px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            margin-bottom: 14px;
+        }
+
+        .cv-upload-zone:hover {
+            border-color: #2e7d32;
+            background: #f0fdf4;
+        }
+
+        .cv-upload-zone .upload-icon { font-size: 2.2rem; color: #94a3b8; margin-bottom: 8px; }
+        .cv-upload-zone p { font-size: 0.82rem; color: #64748b; margin: 0; }
+        .cv-upload-zone span { font-size: 0.72rem; color: #94a3b8; }
+
+        .cv-file-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .cv-file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+        }
+
+        .cv-file-icon { color: #2e7d32; font-size: 1.1rem; }
+        .cv-file-name { flex: 1; color: #334155; font-weight: 600; }
+        .cv-file-size { color: #94a3b8; font-size: 0.72rem; }
+
+        /* ── GRA Biography Card ─────────────────────────────────── */
+        .bio-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            overflow: hidden;
+            border: 1px solid #e8f5e9;
+        }
+
+        .bio-card-banner {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #388e3c 100%);
+            padding: 18px 20px 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .bio-banner-crest {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .bio-banner-text h4 {
+            color: #fff;
+            font-size: 0.92rem;
+            font-weight: 800;
+            margin: 0 0 3px;
+            line-height: 1.3;
+        }
+
+        .bio-banner-text p {
+            color: rgba(255,255,255,0.75);
+            font-size: 0.72rem;
+            margin: 0;
+        }
+
+        .bio-card-body { padding: 16px 18px; }
+
+        .bio-section-label {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        /* Photo placeholder grid */
+        .bio-photo-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .bio-photo-slot {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            background: #f1f5f9;
+            border: 1px dashed #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 0.62rem;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            overflow: hidden;
+        }
+
+        .bio-photo-slot:hover { border-color: #2e7d32; background: #f0fdf4; }
+        .bio-photo-slot .slot-icon { font-size: 1.2rem; }
+        .bio-photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Bio fact rows */
+        .bio-facts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .bio-fact {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 8px 10px;
+            border-left: 3px solid #a5d6a7;
+        }
+
+        .bio-fact-label {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 2px;
+        }
+
+        .bio-fact-value {
+            font-size: 0.78rem;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .bio-card-footer {
+            padding: 12px 18px 16px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .btn-chat-cta {
+            flex: 1;
+            background: #2e7d32;
+            color: #fff;
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            text-decoration: none;
+        }
+
+        .btn-chat-cta:hover { background: #1b5e20; color: #fff; }
+
+        .btn-bio-view {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-bio-view:hover { background: #e2e8f0; }
+
+        /* Verified badge */
+        .bio-verified {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.68rem;
+            font-weight: 800;
+        }
+
+        /* Responsive collapse for narrow screens */
+        @media (max-width: 768px) {
+            .citizen-shell { flex-direction: column; }
+            .profile-sidebar { width: 100%; }
+            .bio-photo-grid { grid-template-columns: repeat(4, 1fr); }
+            .bio-facts { grid-template-columns: 1fr; }
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           BOARD TERMINAL GATE — TRUSTEE DARK DASHBOARD
+           Dark terminal theme, emerald green border language
+        ══════════════════════════════════════════════════════════ */
+
+        /* Shell wrapper */
+        .bt-shell {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        /* ── Title bar ─────────────────────────────────────────── */
+        .bt-titlebar {
+            background: #020c06;
+            border: 1px solid #064e2e;
+            border-left: 4px solid #10b981;
+            border-radius: 10px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .bt-titlebar-left { display: flex; align-items: center; gap: 12px; }
+
+        .bt-window-dots { display: flex; gap: 6px; }
+        .bt-dot {
+            width: 11px; height: 11px; border-radius: 50%;
+        }
+        .bt-dot-red    { background: #ef4444; }
+        .bt-dot-yellow { background: #f59e0b; }
+        .bt-dot-green  { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.7); }
+
+        .bt-title-text {
+            font-size: 0.82rem;
+            font-weight: 900;
+            color: #10b981;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .bt-session-tag {
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.35);
+            border-radius: 20px;
+            color: #34d399;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            padding: 3px 12px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* Blinking cursor */
+        .bt-cursor {
+            display: inline-block;
+            width: 8px; height: 14px;
+            background: #10b981;
+            margin-left: 4px;
+            vertical-align: middle;
+            animation: btBlink 1.1s step-start infinite;
+        }
+        @keyframes btBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        /* ── Live system status banner ─────────────────────────── */
+        .bt-status-banner {
+            background: #020c06;
+            border: 1px solid #064e2e;
+            border-radius: 10px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .bt-status-header {
+            background: #052e1a;
+            border-bottom: 1px solid #064e2e;
+            padding: 9px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bt-status-header-label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            color: #10b981;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .bt-pulse-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 0 0 rgba(16,185,129,0.7);
+            animation: btPulse 1.6s ease-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes btPulse {
+            0%  { box-shadow: 0 0 0 0 rgba(16,185,129,0.6); }
+            70% { box-shadow: 0 0 0 7px rgba(16,185,129,0); }
+            100%{ box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+        }
+
+        .bt-status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+        }
+
+        @media (max-width: 640px) { .bt-status-grid { grid-template-columns: 1fr; } }
+
+        .bt-metric {
+            padding: 14px 18px;
+            border-right: 1px solid #064e2e;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .bt-metric:last-child { border-right: 0; }
+
+        .bt-metric-label {
+            font-size: 0.62rem;
+            color: #34d399;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .bt-metric-value {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #ecfdf5;
+            line-height: 1.1;
+        }
+
+        .bt-metric-sub {
+            font-size: 0.65rem;
+            color: #6ee7b7;
+            letter-spacing: 0.04em;
+        }
+
+        .bt-metric-value.online { color: #4ade80; text-shadow: 0 0 8px rgba(74,222,128,0.5); }
+        .bt-metric-value.offline { color: #f87171; text-shadow: 0 0 8px rgba(248,113,113,0.4); }
+        .bt-metric-value.sync   { color: #34d399; text-shadow: 0 0 8px rgba(52,211,153,0.5); }
+
+        /* ── Tracking ledger panel ─────────────────────────────── */
+        .bt-ledger {
+            background: #020c06;
+            border: 1px solid #064e2e;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bt-ledger-header {
+            background: #052e1a;
+            border-bottom: 1px solid #064e2e;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .bt-ledger-title {
+            font-size: 0.72rem;
+            font-weight: 900;
+            color: #10b981;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .bt-ledger-count {
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.3);
+            border-radius: 20px;
+            color: #6ee7b7;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 10px;
+        }
+
+        /* Scrollable log stream */
+        .bt-log-stream {
+            height: 96px;
+            overflow-y: auto;
+            padding: 10px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            border-bottom: 1px solid #064e2e;
+            scrollbar-width: thin;
+            scrollbar-color: #064e2e transparent;
+        }
+
+        .bt-log-line {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 0.72rem;
+            line-height: 1.4;
+        }
+
+        .bt-log-ts {
+            color: #065f46;
+            flex-shrink: 0;
+            font-size: 0.64rem;
+        }
+
+        .bt-log-prompt { color: #10b981; flex-shrink: 0; }
+
+        .bt-log-msg { color: #a7f3d0; }
+        .bt-log-msg.warn { color: #fbbf24; }
+        .bt-log-msg.info { color: #93c5fd; }
+        .bt-log-msg.err  { color: #f87171; }
+
+        /* ── Verification ledger table ─────────────────────────── */
+        .bt-table-wrap {
+            overflow-x: auto;
+            max-height: 320px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #064e2e transparent;
+        }
+
+        .bt-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.74rem;
+        }
+
+        .bt-table thead tr {
+            background: #031a0e;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .bt-table th {
+            padding: 9px 12px;
+            color: #10b981;
+            font-size: 0.63rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-bottom: 1px solid #064e2e;
+            white-space: nowrap;
+        }
+
+        .bt-table td {
+            padding: 9px 12px;
+            color: #a7f3d0;
+            border-bottom: 1px solid #052e1a;
+            vertical-align: middle;
+        }
+
+        .bt-table tbody tr:hover td { background: rgba(16,185,129,0.05); }
+        .bt-table tbody tr:last-child td { border-bottom: 0; }
+
+        /* Type badge */
+        .bt-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border-radius: 4px;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .bt-type-resident  { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+        .bt-type-mobilizer { background: rgba(99,179,237,0.12); color: #93c5fd; border: 1px solid rgba(99,179,237,0.25); }
+
+        /* Status badge */
+        .bt-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border-radius: 4px;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            white-space: nowrap;
+        }
+        .bt-status-pending  { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+        .bt-status-approved { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+
+        /* Action buttons */
+        .bt-btn-authorize {
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.4);
+            border-radius: 5px;
+            color: #34d399;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            padding: 4px 10px;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: background 0.15s, color 0.15s;
+            display: inline-block;
+        }
+        .bt-btn-authorize:hover {
+            background: #10b981;
+            color: #020c06;
+            border-color: #10b981;
+        }
+
+        .bt-btn-verified {
+            background: transparent;
+            border: 1px solid #064e2e;
+            border-radius: 5px;
+            color: #065f46;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            padding: 4px 10px;
+            cursor: default;
+            text-transform: uppercase;
+        }
+
+        /* Empty state */
+        .bt-empty {
+            text-align: center;
+            padding: 32px 20px;
+            color: #065f46;
+            font-size: 0.78rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-gys sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand nav-brand-text fs-3" href="/">
+                GYS 2027 Campaign
+            </a>
+            
+            <div class="d-flex mx-auto" style="gap: 20px;">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input class="form-control" type="search" placeholder="Search platform..." style="border-radius: 20px; padding: 8px 60px 8px 20px; width: 300px; background-color: #f1f3f5; border: none;" aria-label="Search">
+                    <button class="btn" type="submit" style="background-color: #2e7d32; color: white; border-radius: 20px; padding: 6px 20px; font-weight: bold; border: none; position: absolute; right: 2px; cursor: pointer;">Search</button>
+                </div>
+            </div>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="/" style="color: #6c757d; font-weight: 500;">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" style="color: #6c757d; font-weight: 500;">About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" style="color: #6c757d; font-weight: 500;">Resources</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}" style="color: #dc3545; font-weight: 500;">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="portal-header text-center">
+        <div class="container">
+            <h1 class="fw-bold display-5">GYS 2027 CAMPAIGN</h1>
+            <p class="lead opacity-75">Integrated campaign infrastructure for mobilization tracking, token verification, voucher configuration, and trustee command review.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info text-center shadow-sm border-start border-4 border-info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container mb-5">
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                <div class="card card-custom">
+                    <div class="card-header card-header-gys p-3 fs-5">
+                        <i class="fa-solid fa-building me-2"></i> Organization Profile
+                    </div>
+                    <div class="card-body">
+                        
+                        <!-- Logo Section -->
+                        <div class="text-center mb-4">
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="GYS Logo" style="max-width: 120px; height: auto;" class="shadow-sm rounded">
+                            <h5 class="fw-bold text-success mt-3">GYS 2027 Campaign</h5>
+                            <p class="text-muted small">Bauchi, Nigeria</p>
+                        </div>
+
+                        <!-- Aims & Objectives -->
+                        <div class="mb-4 p-3 bg-light rounded border-start border-4 border-success">
+                            <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-target me-2"></i> Aims & Objectives</h6>
+                            <ul class="small text-muted ps-3 mb-0">
+                                <li>Mobilize youth participation in community development</li>
+                                <li>Strengthen regional security and identification mapping</li>
+                                <li>Foster inclusive campaign engagement</li>
+                                <li>Promote transparent administrative operations</li>
+                            </ul>
+                        </div>
+
+                        <!-- Core Activities -->
+                        <div class="mb-4 p-3 bg-light rounded border-start border-4 border-info">
+                            <h6 class="fw-bold text-info mb-2"><i class="fa-solid fa-tasks me-2"></i> Core Activities</h6>
+                            <ul class="small text-muted ps-3 mb-0">
+                                <li>Campaign tracking</li>
+                                <li>Automated token profile verification</li>
+                                <li>Voucher configuration</li>
+                                <li>Trustee command review logs</li>
+                            </ul>
+                        </div>
+
+                        <!-- Board of Trustees -->
+                        <div class="p-3 bg-light rounded border-start border-4 border-warning">
+                            <h6 class="fw-bold text-warning mb-3"><i class="fa-solid fa-users-gear me-2"></i> Board of Trustees</h6>
+                            <div class="small space-y-2">
+                                <div class="pb-2 border-bottom">
+                                    <span class="fw-bold text-dark">Chairman</span><br>
+                                    <span class="text-muted">Designated Authority</span>
+                                </div>
+                                <div class="pb-2 border-bottom">
+                                    <span class="fw-bold text-dark">Vice Chairman</span><br>
+                                    <span class="text-muted">Operations Lead</span>
+                                </div>
+                                <div class="pb-2 border-bottom">
+                                    <span class="fw-bold text-dark">Secretary</span><br>
+                                    <span class="text-muted">Records & Communications</span>
+                                </div>
+                                <div>
+                                    <span class="fw-bold text-dark">Treasurer</span><br>
+                                    <span class="text-muted">Finance Administration</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Static Resources -->
+                        <div class="mt-4 p-3 bg-light rounded border-start border-4 border-secondary">
+                            <h6 class="fw-bold text-secondary mb-3"><i class="fa-solid fa-folder-open me-2"></i> Static Resources</h6>
+                            <ul class="small text-muted ps-3 mb-0">
+                                <li>Organization Logo (logo.png)</li>
+                                <li>Dashboard Background Asset</li>
+                                <li>Campaign profile templates</li>
+                                <li>Visual identity and platform branding</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+
+                {# ═══════════════════════════════════════════════════════
+                   ROLE ROUTER — three exclusive view branches
+                   1. trustee  → Board Terminal Gate (dark terminal UI)
+                   2. campaign → Deployment Dashboard  (six metric grid)
+                   3. citizen  → Approved member welcome card
+                ═══════════════════════════════════════════════════════ #}
+
+                {% if session.get('user_type') == 'trustee' or session.get('role') == 'trustee' %}
+                {% set campaign_profiles = citizens | rejectattr('reg_type', 'equalto', 'TR_Citizen') | list %}
+                <!-- ════════════════════════════════════════════════════
+                     BRANCH 1 · BOARD TERMINAL GATE
+                     session.user_type == 'trustee'
+                ════════════════════════════════════════════════════ -->
+                <div class="bt-shell">
+
+                    <!-- Title bar -->
+                    <div class="bt-titlebar">
+                        <div class="bt-titlebar-left">
+                            <div class="bt-window-dots">
+                                <div class="bt-dot bt-dot-red"></div>
+                                <div class="bt-dot bt-dot-yellow"></div>
+                                <div class="bt-dot bt-dot-green"></div>
+                            </div>
+                            <span class="bt-title-text">
+                                Board Terminal Gate<span class="bt-cursor"></span>
+                            </span>
+                        </div>
+                        <span class="bt-session-tag">&#x1F512; Trustee Session</span>
+                    </div>
+
+                    <!-- Live system status banner -->
+                    <div class="bt-status-banner">
+                        <div class="bt-status-header">
+                            <div class="bt-pulse-dot"></div>
+                            <span class="bt-status-header-label">Live System Status</span>
+                        </div>
+                        <div class="bt-status-grid">
+                            <div class="bt-metric">
+                                <span class="bt-metric-label">Sync Status</span>
+                                <span class="bt-metric-value sync" id="bt-sync-val">Active Handshake</span>
+                                <span class="bt-metric-sub">System Sync Status</span>
+                            </div>
+                            <div class="bt-metric">
+                                <span class="bt-metric-label">Users Online</span>
+                                <span class="bt-metric-value online" id="bt-online-val">24</span>
+                                <span class="bt-metric-sub">Active sessions</span>
+                            </div>
+                            <div class="bt-metric">
+                                <span class="bt-metric-label">Users Offline</span>
+                                <span class="bt-metric-value offline" id="bt-offline-val">12</span>
+                                <span class="bt-metric-sub">Inactive / logged out</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tracking ledger — log stream + verification table -->
+                    <div class="bt-ledger">
+
+                        <!-- Log stream header -->
+                        <div class="bt-ledger-header">
+                            <span class="bt-ledger-title">&#x25B6; Administrative System Log</span>
+                            <span class="bt-ledger-count" id="bt-log-count">Loading…</span>
+                        </div>
+
+                        <!-- Scrollable terminal output -->
+                        <div class="bt-log-stream" id="bt-log-stream">
+                            <div class="bt-log-line">
+                                <span class="bt-log-ts">00:00:01</span>
+                                <span class="bt-log-prompt">$</span>
+                                <span class="bt-log-msg">GYS 2027 Campaign Board Terminal initialised. Secure channel established.</span>
+                            </div>
+                            <div class="bt-log-line">
+                                <span class="bt-log-ts">00:00:02</span>
+                                <span class="bt-log-prompt">$</span>
+                                <span class="bt-log-msg info">Campaign database synced — {{ campaign_profiles | length }} campaign profile(s) loaded.</span>
+                            </div>
+                            <div class="bt-log-line">
+                                <span class="bt-log-ts">00:00:03</span>
+                                <span class="bt-log-prompt">$</span>
+                                <span class="bt-log-msg warn">
+                                    Pending verification queue:
+                                    {{ campaign_profiles | selectattr('approved', 'equalto', False) | list | length }}
+                                    profile(s) awaiting trustee sign-off.
+                                </span>
+                            </div>
+                            <div class="bt-log-line">
+                                <span class="bt-log-ts">00:00:04</span>
+                                <span class="bt-log-prompt">$</span>
+                                <span class="bt-log-msg">Session authenticated — trustee node: {{ session.get('trustee_node', 'N/A') }}</span>
+                            </div>
+                            <div class="bt-log-line">
+                                <span class="bt-log-ts">00:00:05</span>
+                                <span class="bt-log-prompt">$</span>
+                                <span class="bt-log-msg info">Heartbeat OK · encryption layer active · audit trail recording.</span>
+                            </div>
+                        </div>
+
+                        <!-- Verification table header -->
+                        <div class="bt-ledger-header" style="border-top: 1px solid #064e2e;">
+                            <span class="bt-ledger-title">&#x25A6; Campaign Verification Ledger</span>
+                            <span class="bt-ledger-count">{{ campaign_profiles | length }} profile(s)</span>
+                        </div>
+
+                        <!-- Scrollable verification table -->
+                        <div class="bt-table-wrap">
+                            <table class="bt-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Profile</th>
+                                        <th>Full Name</th>
+                                        <th>Phone</th>
+                                        <th>Location</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for citizen in campaign_profiles %}
+                                    <tr>
+                                        <td style="color:#065f46; font-size:0.65rem;">#{{ '%04d' % citizen.id }}</td>
+                                        <td>
+                                            <span class="bt-type-badge bt-type-mobilizer">&#x1F4E3; Campaign Profile</span>
+                                        </td>
+                                        <td style="color:#ecfdf5; font-weight:700;">{{ citizen.full_name }}</td>
+                                        <td style="color:#6ee7b7;">{{ citizen.phone }}</td>
+                                        <td>
+                                            <span style="color:#a7f3d0; font-size:0.71rem;">{{ citizen.ward or 'Campaign ward pending' }}{% if citizen.pvc_number %}<br><span style="color:#065f46;">PVC: {{ citizen.pvc_number }}</span>{% endif %}</span>
+                                        </td>
+                                        <td>
+                                            {% if citizen.approved %}
+                                                <span class="bt-status-badge bt-status-approved">&#x2713; Verified</span>
+                                            {% else %}
+                                                <span class="bt-status-badge bt-status-pending">&#x23F3; Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if not citizen.approved %}
+                                                <a href="{{ url_for('approve_citizen', citizen_id=citizen.id) }}"
+                                                   class="bt-btn-authorize"
+                                                   title="Authorize profile #{{ citizen.id }}">
+                                                    Authorize
+                                                </a>
+                                            {% else %}
+                                                <span class="bt-btn-verified">&#x2714; Done</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="7" class="bt-empty">
+                                            &gt; No campaign profiles mapped in registry database yet.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div><!-- /.bt-ledger -->
+                </div><!-- /.bt-shell -->
+
+                {% elif session.get('user_type') == 'campaign' %}
+                <!-- ════════════════════════════════════════════════════
+                     BRANCH 2 · CAMPAIGN DEPLOYMENT DASHBOARD
+                     session.user_type == 'campaign'
+                ════════════════════════════════════════════════════ -->
+                <div class="cd-shell">
+
+                    <!-- Identity top-bar -->
+                    <div class="cd-topbar">
+                        <div class="cd-topbar-left">
+                            <div class="cd-topbar-avatar">📣</div>
+                            <div>
+                                <div class="cd-topbar-name">{{ session.get('user_name', 'Campaign Officer') }}</div>
+                                <div class="cd-topbar-role">Campaign Mobilization Officer</div>
+                            </div>
+                        </div>
+                        <div class="cd-topbar-badge">&#x26A1; Deployment Active</div>
+                    </div>
+
+                    <!-- 6-cell metric grid -->
+                    <div class="cd-grid">
+
+                        <!-- BOX A · Aims & Objectives -->
+                        <div class="cd-box cd-box-aims">
+                            <div class="cd-box-header">
+                                <div class="cd-box-icon">🎯</div>
+                                <span class="cd-box-title">Aims &amp; Objectives</span>
+                            </div>
+                            <div class="cd-box-body">
+                                <div class="aims-item"><div class="aims-bullet">&#x2713;</div><span>Mobilize registered voters across all target wards</span></div>
+                                <div class="aims-item"><div class="aims-bullet">&#x2713;</div><span>Achieve 80% voter turnout in target LGAs</span></div>
+                                <div class="aims-item"><div class="aims-bullet">&#x2713;</div><span>Coordinate ward-level outreach teams weekly</span></div>
+                                <div class="aims-item"><div class="aims-bullet">&#x2713;</div><span>Verify and log all field activities in real-time</span></div>
+                                <div class="aims-item"><div class="aims-bullet">&#x2713;</div><span>Submit PVC confirmation reports to board</span></div>
+                            </div>
+                        </div>
+
+                        <!-- BOX B · Field Activities (background photo placeholder) -->
+                        <div class="cd-box cd-box-field"
+                             style="background-image: url('{{ url_for('static', filename='background.jpg') }}');">
+                            <div class="cd-box-header">
+                                <div class="cd-box-icon">🗂️</div>
+                                <span class="cd-box-title">Field Activities</span>
+                            </div>
+                            <div class="cd-box-body">
+                                <div class="field-log-item">
+                                    <div class="field-log-dot"></div>
+                                    <div>
+                                        <div class="field-log-text">Ward 5 house-to-house outreach completed</div>
+                                        <div class="field-log-time">Today · 09:14</div>
+                                    </div>
+                                </div>
+                                <div class="field-log-item">
+                                    <div class="field-log-dot"></div>
+                                    <div>
+                                        <div class="field-log-text">Market square rally — 220 attendees logged</div>
+                                        <div class="field-log-time">Yesterday · 15:30</div>
+                                    </div>
+                                </div>
+                                <div class="field-log-item">
+                                    <div class="field-log-dot"></div>
+                                    <div>
+                                        <div class="field-log-text">PVC verification drive — 47 confirmed</div>
+                                        <div class="field-log-time">2 days ago · 11:00</div>
+                                    </div>
+                                </div>
+                                <div class="field-add-btn" role="button" tabindex="0">+ Log New Field Activity</div>
+                            </div>
+                        </div>
+
+                        <!-- BOX C · Core Target Areas -->
+                        <div class="cd-box cd-box-target">
+                            <div class="cd-box-header">
+                                <div class="cd-box-icon">📍</div>
+                                <span class="cd-box-title">Core Target Areas</span>
+                            </div>
+                            <div class="cd-box-body">
+                                <div class="target-ward"><span class="target-ward-name">GRA Ward 1</span><div class="target-bar-wrap"><div class="target-bar-fill" style="width:82%"></div></div><span class="target-pct">82%</span></div>
+                                <div class="target-ward"><span class="target-ward-name">Wunti</span><div class="target-bar-wrap"><div class="target-bar-fill" style="width:67%"></div></div><span class="target-pct">67%</span></div>
+                                <div class="target-ward"><span class="target-ward-name">Makama</span><div class="target-bar-wrap"><div class="target-bar-fill" style="width:54%"></div></div><span class="target-pct">54%</span></div>
+                                <div class="target-ward"><span class="target-ward-name">Hardo</span><div class="target-bar-wrap"><div class="target-bar-fill" style="width:39%"></div></div><span class="target-pct">39%</span></div>
+                                <div class="target-ward"><span class="target-ward-name">Dan-Iya</span><div class="target-bar-wrap"><div class="target-bar-fill" style="width:21%"></div></div><span class="target-pct">21%</span></div>
+                            </div>
+                        </div>
+
+                        <!-- BOX D · Strategic Project Focus -->
+                        <div class="cd-box cd-box-project">
+                            <div class="cd-box-header">
+                                <div class="cd-box-icon">🧩</div>
+                                <span class="cd-box-title">Strategic Project Focus</span>
+                            </div>
+                            <div class="cd-box-body">
+                                <div class="project-item"><div class="project-item-title">PVC Mass Collection Drive</div><div class="project-item-meta"><span class="project-phase phase-active">Active</span><span class="project-area">Bauchi LGA · All Wards</span></div></div>
+                                <div class="project-item"><div class="project-item-title">Youth Engagement Forums</div><div class="project-item-meta"><span class="project-phase phase-planning">Planning</span><span class="project-area">GRA, Wunti, Makama</span></div></div>
+                                <div class="project-item"><div class="project-item-title">Ward Coordinator Training</div><div class="project-item-meta"><span class="project-phase phase-review">In Review</span><span class="project-area">Headquarters</span></div></div>
+                            </div>
+                        </div>
+
+                        <!-- BOX E · Core Mobilization Mission -->
+                        <div class="cd-box cd-box-mission">
+                            <div class="cd-box-header">
+                                <div class="cd-box-icon">📝</div>
+                                <span class="cd-box-title">Core Mobilization Mission</span>
+                            </div>
+                            <div class="cd-box-body">
+                                <textarea class="mission-textarea" id="missionText"
+                                    placeholder="Draft your unit's mobilization mission statement…"
+                                    aria-label="Core mobilization mission">To systematically engage every registered voter across assigned wards, build strong community trust networks, and ensure maximum participation in the democratic process through coordinated, data-driven outreach.</textarea>
+                                <button type="button" class="mission-save-btn" onclick="saveMission()">Save Mission</button>
+                            </div>
+                        </div>
+
+                        <!-- BOX F · Voter Data Analytics -->
+                        <div class="cd-box cd-box-voter">
+                            <div class="cd-box-header">
+                                <div class="cd-box-icon">🔍</div>
+                                <span class="cd-box-title">Voter Data Analytics</span>
+                            </div>
+                            <div class="cd-box-body">
+                                <div class="voter-stat-row">
+                                    <div class="voter-stat"><div class="voter-stat-num">1,284</div><div class="voter-stat-label">Registered</div></div>
+                                    <div class="voter-stat"><div class="voter-stat-num">847</div><div class="voter-stat-label">Confirmed</div></div>
+                                    <div class="voter-stat"><div class="voter-stat-num">437</div><div class="voter-stat-label">Pending</div></div>
+                                </div>
+                                <div class="voter-search-row">
+                                    <input type="search" class="voter-search-input" id="voterSearchInput"
+                                           placeholder="Search by name, ward, or PVC…"
+                                           aria-label="Voter registry search">
+                                    <button type="button" class="voter-search-btn" onclick="runVoterSearch()">Search</button>
+                                </div>
+                                <div class="voter-filter-row">
+                                    <span class="voter-filter-chip active" role="button" tabindex="0" onclick="toggleChip(this)">All</span>
+                                    <span class="voter-filter-chip" role="button" tabindex="0" onclick="toggleChip(this)">PVC Verified</span>
+                                    <span class="voter-filter-chip" role="button" tabindex="0" onclick="toggleChip(this)">Pending</span>
+                                    <span class="voter-filter-chip" role="button" tabindex="0" onclick="toggleChip(this)">My Ward</span>
+                                </div>
+                                <div class="voter-result-hint" id="voterResultHint">Enter a name, ward, or PVC number to query the registry.</div>
+                            </div>
+                        </div>
+
+                    </div><!-- /.cd-grid -->
+                </div><!-- /.cd-shell -->
+
+                {% else %}
+                <!-- ════════════════════════════════════════════════════
+                     BRANCH 3 · CITIZEN WELCOME CARD
+                     session.user_type == 'citizen'  (or any other role)
+                ════════════════════════════════════════════════════ -->
+                <div class="card card-custom">
+                    <div class="card-header card-header-gys p-3 fs-5">
+                        <i class="fa-solid fa-newspaper me-2"></i> GYS 2027 Campaign Dashboard
+                    </div>
+                    <div class="card-body p-4 text-center py-5">
+                        <div class="mb-4 text-success"><i class="fa-solid fa-circle-check display-3"></i></div>
+                        <h3 class="fw-bold text-dark">Welcome, {{ session.get('user_name') }}!</h3>
+                        <p class="text-muted mx-auto" style="max-width: 500px;">Your campaign profile credential mapping file is approved and fully verified. You now have standard campaign portal clearance.</p>
+                        <hr class="my-4 mx-auto w-50">
+                        <p class="small text-muted">Stay tuned for additional workspace utilities and upcoming forum releases scheduled by the Board of Trustees.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        /* ═══════════════════════════════════════════════════════════
+           BOARD TERMINAL GATE — live metric + log simulation
+        ═══════════════════════════════════════════════════════════ */
+        (function () {
+            var syncStates = [
+                'Active Handshake', 'Encrypting Channel', 'Verifying Token',
+                'Session Stable', 'Re-syncing…', 'Secure Bridge Open'
+            ];
+            var syncIdx     = 0;
+            var onlineBase  = 24;
+            var offlineBase = 12;
+
+            function jitter(base, range) {
+                return base + Math.floor(Math.random() * range * 2) - range;
+            }
+
+            var syncEl    = document.getElementById('bt-sync-val');
+            var onlineEl  = document.getElementById('bt-online-val');
+            var offlineEl = document.getElementById('bt-offline-val');
+
+            if (syncEl) {
+                setInterval(function () {
+                    syncIdx = (syncIdx + 1) % syncStates.length;
+                    syncEl.textContent    = syncStates[syncIdx];
+                    onlineEl.textContent  = jitter(onlineBase,  4);
+                    offlineEl.textContent = jitter(offlineBase, 3);
+                }, 3800);
+            }
+
+            /* Auto-append live log lines every 4.5 s */
+            var logMessages = [
+                { cls: 'info', msg: 'Heartbeat ping received — all nodes responsive.' },
+                { cls: '',     msg: 'Registry checkpoint: no schema drift detected.' },
+                { cls: 'warn', msg: 'Session token refreshed for active trustee node.' },
+                { cls: 'info', msg: 'Encrypted audit trail write — 1 new event recorded.' },
+                { cls: '',     msg: 'Database integrity check passed. All tables nominal.' },
+                { cls: 'warn', msg: 'Idle timeout warning: session expires in 15 min.' },
+                { cls: 'info', msg: 'Sync handshake re-acknowledged. Channel stable.' },
+                { cls: '',     msg: 'Backup snapshot queued for next maintenance window.' },
+            ];
+            var logIdx    = 0;
+            var logStream = document.getElementById('bt-log-stream');
+            var logCount  = document.getElementById('bt-log-count');
+
+            function fmtTs() {
+                var d = new Date();
+                return ('0'+d.getHours()).slice(-2)+':'+
+                       ('0'+d.getMinutes()).slice(-2)+':'+
+                       ('0'+d.getSeconds()).slice(-2);
+            }
+
+            function appendLog() {
+                if (!logStream) return;
+                var entry = logMessages[logIdx % logMessages.length];
+                logIdx++;
+                var line = document.createElement('div');
+                line.className = 'bt-log-line';
+                line.innerHTML =
+                    '<span class="bt-log-ts">' + fmtTs() + '</span>' +
+                    '<span class="bt-log-prompt">$</span>' +
+                    '<span class="bt-log-msg ' + entry.cls + '">' + entry.msg + '</span>';
+                logStream.appendChild(line);
+                logStream.scrollTop = logStream.scrollHeight;
+                /* Cap at 20 visible lines */
+                while (logStream.children.length > 20) {
+                    logStream.removeChild(logStream.firstChild);
+                }
+                if (logCount) logCount.textContent = logStream.children.length + ' entries';
+            }
+
+            if (logStream) {
+                if (logCount) logCount.textContent = logStream.children.length + ' entries';
+                setInterval(appendLog, 4500);
+            }
+        })();
+
+        /* ═══════════════════════════════════════════════════════════
+           CAMPAIGN DEPLOYMENT DASHBOARD — interaction helpers
+        ═══════════════════════════════════════════════════════════ */
+        function saveMission() {
+            var ta = document.getElementById('missionText');
+            if (!ta) return;
+            var btn = ta.closest('.cd-box-body').querySelector('.mission-save-btn');
+            btn.textContent = '✓ Saved';
+            btn.style.background = '#16a34a';
+            setTimeout(function () {
+                btn.textContent = 'Save Mission';
+                btn.style.background = '';
+            }, 2000);
+        }
+
+        function runVoterSearch() {
+            var q    = (document.getElementById('voterSearchInput').value || '').trim();
+            var hint = document.getElementById('voterResultHint');
+            if (!hint) return;
+            if (!q) { hint.textContent = 'Please enter a search term.'; return; }
+            hint.textContent = 'Searching registry for "' + q + '" …';
+        }
+
+        var vsInput = document.getElementById('voterSearchInput');
+        if (vsInput) {
+            vsInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') { e.preventDefault(); runVoterSearch(); }
+            });
+        }
+
+        function toggleChip(el) {
+            var chips = el.closest('.voter-filter-row').querySelectorAll('.voter-filter-chip');
+            chips.forEach(function (c) { c.classList.remove('active'); });
+            el.classList.add('active');
+        }
+    </script>
+</body>
+</html>

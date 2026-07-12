@@ -1,0 +1,18 @@
+# Local Environment Secrets
+.env
+.env.local
+.env.secret
+
+# Local Database Files
+instance/
+gys_registry.db
+
+# Python Caches & Build Files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+env/
+venv/
