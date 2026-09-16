@@ -4,11 +4,10 @@ app.py — GYS Session-Based Dynamic Role Router
 Architecture overview
 ─────────────────────
   /                       → gate.html          (public landing)
-  /citizen/register       → register citizens  (TR stream & General stream)
-  /citizen/login          → citizen login      → session user_type: 'citizen'
+  /mobilization/register  → campaign registration
   /mobilization/login     → campaign login     → session user_type: 'campaign'
   /trustee/login          → board login        → session user_type: 'trustee'
-  /home                   → index.html         (citizen view)
+  /home                   → index.html         (authenticated portal view)
   /admin/sync-verification → sync.html         (trustee pre-dashboard)
   /admin/dashboard        → admin_dashboard.html (trustee command central)
   /admin/approve/<id>     → approval action
@@ -18,22 +17,27 @@ Architecture overview
 
 session keys written on login
 ──────────────────────────────
-  session['user_type']   →  'citizen' | 'campaign' | 'trustee'
+  session['user_type']   →  'campaign' | 'trustee'
   session['user_name']   →  display name
-  session['user_id']     →  DB record id (citizens only)
-  session['approved']    →  bool (citizens only)
+  session['user_id']     →  DB record id
+  session['approved']    →  bool
   session['is_admin']    →  True (trustee only)
 """
 
 import os
+import re
+import secrets
+import uuid
 from datetime import datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
-from flask import (Flask, flash, redirect, render_template,
-                   request, session, url_for)
+from flask import (Flask, abort, flash, redirect, render_template,
+                   request, send_from_directory, session, url_for)
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, inspect, or_, text
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 # ─────────────────────────────────────────────
 # 1.  Bootstrap
@@ -51,6 +55,16 @@ if _db_url.startswith('postgres://'):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = _db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAX_CONTENT_LENGTH'] = 6 * 1024 * 1024
+
+PASSPORT_UPLOAD_DIR = Path(app.instance_path) / 'uploads' / 'passports'
+MAX_PASSPORT_BYTES = 5 * 1024 * 1024
+ALLOWED_IMAGE_SIGNATURES = {
+    '.jpg': ('image/jpeg', lambda data: data.startswith(b'\xff\xd8\xff')),
+    '.jpeg': ('image/jpeg', lambda data: data.startswith(b'\xff\xd8\xff')),
+    '.png': ('image/png', lambda data: data.startswith(b'\x89PNG\r\n\x1a\n')),
+    '.webp': ('image/webp', lambda data: data.startswith(b'RIFF') and data[8:12] == b'WEBP'),
+}
 
 db = SQLAlchemy(app)
 
@@ -59,18 +73,21 @@ db = SQLAlchemy(app)
 # ─────────────────────────────────────────────
 
 class Citizen(db.Model):
-    """Covers both GRA residents (TR_Citizen) and general mobilizers (General)."""
+    """Legacy registry table reused for campaign registrations."""
     id           = db.Column(db.Integer, primary_key=True)
     full_name    = db.Column(db.String(150), nullable=False)
     phone        = db.Column(db.String(50),  unique=True, nullable=False)
-    reg_type     = db.Column(db.String(50),  nullable=False)   # TR_Citizen | General
+    reg_type     = db.Column(db.String(50),  nullable=False)   # General for campaign registrations
     password     = db.Column(db.String(256), nullable=False)
     ward         = db.Column(db.String(100), nullable=True)
     pvc_number   = db.Column(db.String(100), nullable=True)
     email        = db.Column(db.String(150), nullable=True)
     area_name    = db.Column(db.String(150), nullable=True)
     house_number = db.Column(db.String(50),  nullable=True)
+    passport_image = db.Column(db.String(255), nullable=True)
     approved     = db.Column(db.Boolean,     default=False)
+    created_at   = db.Column(db.DateTime,    default=datetime.utcnow)
+    updated_at   = db.Column(db.DateTime,    default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class ChatMessage(db.Model):
@@ -87,9 +104,6 @@ class LogEvent(db.Model):
     message    = db.Column(db.Text,       nullable=False)
     timestamp  = db.Column(db.DateTime,   default=datetime.utcnow)
 
-
-with app.app_context():
-    db.create_all()
 
 # ─────────────────────────────────────────────
 # 3.  Helpers
@@ -113,6 +127,85 @@ def _log(event_type: str, message: str) -> None:
         db.session.rollback()
 
 
+def _ensure_schema_columns() -> None:
+    """Add minimal columns needed by the simplified campaign registration flow."""
+    inspector = inspect(db.engine)
+    columns = {column['name'] for column in inspector.get_columns('citizen')}
+    dialect = db.engine.dialect.name
+
+    if dialect == 'postgresql':
+        statements = {
+            'passport_image': 'ALTER TABLE citizen ADD COLUMN IF NOT EXISTS passport_image VARCHAR(255)',
+            'created_at': 'ALTER TABLE citizen ADD COLUMN IF NOT EXISTS created_at TIMESTAMP',
+            'updated_at': 'ALTER TABLE citizen ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP',
+        }
+    else:
+        statements = {
+            'passport_image': 'ALTER TABLE citizen ADD COLUMN passport_image VARCHAR(255)',
+            'created_at': 'ALTER TABLE citizen ADD COLUMN created_at DATETIME',
+            'updated_at': 'ALTER TABLE citizen ADD COLUMN updated_at DATETIME',
+        }
+
+    for column_name, statement in statements.items():
+        if column_name not in columns:
+            db.session.execute(text(statement))
+
+    db.session.commit()
+
+
+def _normalize_email(value: str) -> str:
+    return (value or '').strip().lower()
+
+
+def _normalize_name(value: str) -> str:
+    return re.sub(r'\s+', ' ', (value or '').strip())
+
+
+def _normalize_pvc_number(value: str) -> str:
+    return (value or '').strip().upper()
+
+
+def _is_valid_email(value: str) -> bool:
+    return bool(re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', value or ''))
+
+
+def _is_valid_pvc_number(value: str) -> bool:
+    return bool(re.fullmatch(r'[A-Z0-9/-]{5,50}', value or ''))
+
+
+def _validate_passport_upload(file_storage):
+    if not file_storage or not file_storage.filename:
+        return False, 'Passport photograph is required.'
+
+    original_name = secure_filename(file_storage.filename)
+    extension = Path(original_name).suffix.lower()
+    if extension not in ALLOWED_IMAGE_SIGNATURES:
+        return False, 'Passport photograph must be a JPG, JPEG, PNG, or WebP image.'
+
+    file_storage.stream.seek(0, os.SEEK_END)
+    size = file_storage.stream.tell()
+    file_storage.stream.seek(0)
+    if size <= 0:
+        return False, 'Passport photograph is empty.'
+    if size > MAX_PASSPORT_BYTES:
+        return False, 'Passport photograph must not exceed 5 MB.'
+
+    header = file_storage.stream.read(16)
+    file_storage.stream.seek(0)
+    if not ALLOWED_IMAGE_SIGNATURES[extension][1](header):
+        return False, 'Passport photograph is not a valid image file.'
+
+    safe_filename = f'{uuid.uuid4().hex}{extension}'
+    PASSPORT_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    file_storage.save(PASSPORT_UPLOAD_DIR / safe_filename)
+    return True, safe_filename
+
+
+with app.app_context():
+    db.create_all()
+    _ensure_schema_columns()
+
+
 # ─────────────────────────────────────────────
 # 4.  Security middleware
 # ─────────────────────────────────────────────
@@ -120,11 +213,7 @@ def _log(event_type: str, message: str) -> None:
 # Routes that are open to unauthenticated visitors
 _PUBLIC_ENDPOINTS = {
     'gate',
-    'citizen_register_tr',
-    'citizen_register',
-    'citizen_register_general',
     'mobilization_register',
-    'citizen_login',
     'mobilization_login',
     'trustee_login',
     'static',
@@ -142,14 +231,19 @@ def require_authentication():
         return redirect(url_for('gate'))
 
 
+@app.errorhandler(413)
+def request_entity_too_large(_error):
+    flash('Passport photograph must not exceed 5 MB.')
+    return redirect(url_for('gate')), 413
+
+
 # ─────────────────────────────────────────────
 # 5.  Public landing
 # ─────────────────────────────────────────────
 
 @app.route('/')
 def gate():
-    """Public entry point — shows the gate template with citizen login /
-    register tabs and the trustee terminal panel."""
+    """Public entry point for campaign registration and trustee access."""
     return render_template(
         'gate.html',
         section='gate',
@@ -158,189 +252,66 @@ def gate():
 
 
 # ─────────────────────────────────────────────
-# 6.  Citizen registration  →  /citizen/register
+# 6.  Campaign registration  →  /mobilization/register
 # ─────────────────────────────────────────────
-
-@app.route('/citizen/register/tr', methods=['POST'])
-def citizen_register_tr():
-    """Stream A — GRA Resident (TR_Citizen) registration."""
-    full_name    = request.form.get('full_name', '').strip()
-    phone        = request.form.get('phone', '').strip()
-    email        = request.form.get('email', '').strip()
-    ward_or_area = (request.form.get('ward') or request.form.get('area_name') or '').strip()
-    password     = request.form.get('password', '')
-
-    if not all([full_name, phone, password]):
-        flash('Please fill in all required fields.')
-        return redirect(url_for('gate'))
-
-    phone_key = f"email:{email.lower()}"
-    if Citizen.query.filter_by(phone=phone_key).first():
-        flash('Registration failed — this phone number is already on record.')
-        return redirect(url_for('gate'))
-
-    resident = Citizen(
-        reg_type    = 'TR_Citizen',
-        full_name   = full_name,
-        phone       = phone,
-        email       = email,
-        ward        = ward_or_area,
-        area_name   = ward_or_area,
-        password    = _hash(password),
-        approved    = False,
-    )
-    db.session.add(resident)
-    db.session.commit()
-    _log('REGISTER', f'TR Citizen registered: {full_name} ({phone})')
-
-    flash('GRA Resident profile created. Awaiting board verification.')
-    return redirect(url_for('gate'))
-
-
-@app.route('/citizen/register/general', methods=['POST'])
-def citizen_register_general():
-    """Legacy path — kept so any old bookmarks still work."""
-    # Reuse the mobilization_register logic by reposting internally
-    full_name  = request.form.get('full_name', '').strip()
-    phone      = request.form.get('phone', '').strip()
-    email      = request.form.get('email', '').strip()
-    ward       = request.form.get('ward', '').strip()
-    pvc_number = request.form.get('pvc_number', '').strip()
-    password   = request.form.get('password', '')
-
-    if not all([full_name, phone, ward, pvc_number, password]):
-        flash('Please fill in all required fields.')
-        return redirect(url_for('gate'))
-
-    if Citizen.query.filter_by(phone=phone).first():
-        flash('Registration failed — profile parameters already exist.')
-        return redirect(url_for('gate'))
-
-    mobilizer = Citizen(
-        reg_type   = 'General',
-        full_name  = full_name,
-        phone      = phone,
-        email      = email,
-        ward       = ward,
-        pvc_number = pvc_number,
-        password   = _hash(password),
-        approved   = False,
-    )
-    db.session.add(mobilizer)
-    db.session.commit()
-    _log('REGISTER', f'General mobilizer registered: {full_name} ({phone})')
-
-    flash('Campaign profile submitted. Awaiting administrative authorization.')
-    return redirect(url_for('gate'))
-
-
-@app.route('/citizen/register', methods=['GET', 'POST'])
-def citizen_register():
-    """Form A — GRA Citizen Registry.
-    Accepts full_name, house_number, phone, email, id_document (file), password."""
-    if request.method == 'GET':
-        return redirect(url_for('gate') + '?tab=citizen')
-
-    full_name    = request.form.get('full_name', '').strip()
-    house_number = request.form.get('house_number', '').strip()
-    phone        = request.form.get('phone', '').strip()
-    email        = request.form.get('email', '').strip()
-    password     = request.form.get('password', '')
-
-    if not all([full_name, house_number, phone, password]):
-        flash('Please fill in all required fields.')
-        return redirect(url_for('gate') + '?tab=citizen')
-
-    if Citizen.query.filter_by(phone=phone).first():
-        flash('Registration failed — this phone number is already on record.')
-        return redirect(url_for('gate') + '?tab=citizen')
-
-    resident = Citizen(
-        reg_type     = 'TR_Citizen',
-        full_name    = full_name,
-        phone        = phone,
-        email        = email,
-        house_number = house_number,
-        area_name    = house_number,   # mirrors into area_name for existing views
-        password     = _hash(password),
-        approved     = False,
-    )
-    db.session.add(resident)
-    db.session.commit()
-    _log('REGISTER', f'GRA Citizen registered: {full_name} ({phone})')
-
-    flash('GRA Citizen profile created. Awaiting board verification.')
-    return redirect(url_for('gate'))
-
 
 @app.route('/mobilization/register', methods=['POST'])
 def mobilization_register():
-    """Form B — Campaign Mobilization Enrollment.
-    Accepts full_name, lga, ward, pvc_number, phone, password."""
-    full_name     = request.form.get('full_name', '').strip()
-    email         = request.form.get('email', '').strip()
-    voucher_state = request.form.get('voucher_state', '').strip()
-    password      = request.form.get('password', '')
+    """Campaign registration accepting only fullName/email/pvcNumber/passport."""
+    full_name = _normalize_name(request.form.get('fullName') or request.form.get('full_name'))
+    email = _normalize_email(request.form.get('email'))
+    pvc_number = _normalize_pvc_number(request.form.get('pvcNumber') or request.form.get('pvc_number'))
+    passport = request.files.get('passport')
 
-    if not all([full_name, email, voucher_state, password]):
-        flash('Please fill in all required fields.')
-        return redirect(url_for('gate') + '?tab=campaign')
+    if len(full_name) < 3:
+        flash('Full Name is required and must be at least 3 characters.')
+        return redirect(url_for('gate'))
+    if not _is_valid_email(email):
+        flash('Please enter a valid Email Address.')
+        return redirect(url_for('gate'))
+    if not _is_valid_pvc_number(pvc_number):
+        flash('PVC / Voter Identification Number is required and must use only letters, numbers, hyphens, or slashes.')
+        return redirect(url_for('gate'))
 
-    if Citizen.query.filter_by(phone=phone).first():
-        flash('Enrollment failed — this phone number is already registered.')
-        return redirect(url_for('gate') + '?tab=campaign')
+    is_valid_passport, passport_result = _validate_passport_upload(passport)
+    if not is_valid_passport:
+        flash(passport_result)
+        return redirect(url_for('gate'))
 
+    duplicate = Citizen.query.filter(Citizen.reg_type == 'General').filter(
+        or_(func.lower(Citizen.email) == email, Citizen.pvc_number == pvc_number)
+    ).first()
+    if duplicate:
+        try:
+            (PASSPORT_UPLOAD_DIR / passport_result).unlink(missing_ok=True)
+        except OSError:
+            pass
+        flash('This information has already been registered.')
+        return redirect(url_for('gate'))
+
+    now = datetime.utcnow()
     mobilizer = Citizen(
-        reg_type   = 'General',
-        full_name  = full_name,
-        phone      = phone,
-        ward       = f'{lga} / {ward}',   # LGA + ward stored together
-        pvc_number = pvc_number,
-        password   = _hash(password),
-        approved   = False,
+        reg_type='General',
+        full_name=full_name,
+        email=email,
+        pvc_number=pvc_number,
+        passport_image=passport_result,
+        phone=f'campaign:{secrets.token_hex(12)}',
+        password=_hash(secrets.token_urlsafe(32)),
+        approved=False,
+        created_at=now,
+        updated_at=now,
     )
     db.session.add(mobilizer)
     db.session.commit()
-    _log('REGISTER', f'Campaign mobilizer enrolled: {full_name} ({phone}), LGA: {lga}, Ward: {ward}')
+    _log('REGISTER', f'Campaign registration submitted: {full_name} (id={mobilizer.id})')
 
-    flash('Campaign enrollment submitted. Awaiting administrative authorization.')
-    return redirect(url_for('gate'))
-
-
-# ─────────────────────────────────────────────
-# 7.  Citizen login  →  /citizen/login
-#     Sets user_type: 'citizen'
-# ─────────────────────────────────────────────
-
-@app.route('/citizen/login', methods=['POST'])
-def citizen_login():
-    phone    = request.form.get('phone', '').strip()
-    password = request.form.get('password', '')
-
-    user = Citizen.query.filter_by(phone=phone).first()
-
-    if not user or not _verify(user.password, password):
-        flash('Invalid credentials. Please check your phone number and password.')
-        return redirect(url_for('gate'))
-
-    if not user.approved:
-        flash('Access blocked — your profile is still pending board verification.')
-        return redirect(url_for('gate'))
-
-    # ── Write session ──────────────────────────────────────────────────────
-    session.clear()
-    session['user_type'] = 'citizen'        # role discriminator
-    session['user_name'] = user.full_name
-    session['user_id']   = user.id
-    session['approved']  = True
-    # ───────────────────────────────────────────────────────────────────────
-
-    _log('LOGIN', f'Citizen login: {user.full_name} (id={user.id})')
-    return redirect(url_for('home'))
+    flash('Registration Successful|Your campaign registration has been submitted successfully.')
+    return redirect(url_for('gate') + '?registered=1')
 
 
 # ─────────────────────────────────────────────
-# 8.  Mobilization login  →  /mobilization/login
+# 7.  Mobilization login  →  /mobilization/login
 #     Sets user_type: 'campaign'
 # ─────────────────────────────────────────────
 
@@ -384,7 +355,7 @@ def mobilization_login():
 
 
 # ─────────────────────────────────────────────
-# 9.  Trustee login  →  /trustee/login
+# 8.  Trustee login  →  /trustee/login
 #     Sets user_type: 'trustee'
 # ─────────────────────────────────────────────
 
@@ -427,7 +398,7 @@ def trustee_login():
 
 
 # ─────────────────────────────────────────────
-# 10.  Authenticated views
+# 9.  Authenticated views
 # ─────────────────────────────────────────────
 
 @app.route('/home')
@@ -469,7 +440,7 @@ def admin_dashboard():
         flash('Restricted path. Board trustee authorisation required.')
         return redirect(url_for('gate'))
 
-    citizens = Citizen.query.all()
+    citizens = Citizen.query.filter_by(reg_type='General').order_by(Citizen.created_at.desc(), Citizen.id.desc()).all()
     return render_template(
         'admin_dashboard.html',
         section='admin_dashboard',
@@ -496,6 +467,18 @@ def approve_citizen(citizen_id):
 
     flash(f'Profile #00{citizen_id} — {profile.full_name} — has been authorised.')
     return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/passports/<path:filename>')
+def admin_passport(filename):
+    if session.get('user_type') != 'trustee':
+        abort(404)
+
+    safe_name = secure_filename(filename)
+    if safe_name != filename:
+        abort(404)
+
+    return send_from_directory(PASSPORT_UPLOAD_DIR, safe_name, as_attachment=False)
 
 
 @app.route('/chat', methods=['GET', 'POST'])
@@ -539,7 +522,7 @@ def logout():
 
 
 # ─────────────────────────────────────────────
-# 11.  WSGI entry points
+# 10.  WSGI entry points
 # ─────────────────────────────────────────────
 
 application = app   # Render / gunicorn expects `application`

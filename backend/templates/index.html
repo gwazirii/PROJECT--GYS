@@ -1090,7 +1090,7 @@
                 ═══════════════════════════════════════════════════════ #}
 
                 {% if session.get('user_type') == 'trustee' or session.get('role') == 'trustee' %}
-                {% set campaign_profiles = citizens | rejectattr('reg_type', 'equalto', 'TR_Citizen') | list %}
+                {% set campaign_profiles = citizens | selectattr('reg_type', 'equalto', 'General') | list %}
                 <!-- ════════════════════════════════════════════════════
                      BRANCH 1 · BOARD TERMINAL GATE
                      session.user_type == 'trustee'
@@ -1193,8 +1193,9 @@
                                         <th>ID</th>
                                         <th>Profile</th>
                                         <th>Full Name</th>
-                                        <th>Phone</th>
-                                        <th>Location</th>
+                                        <th>Email</th>
+                                        <th>PVC / Voter ID</th>
+                                        <th>Passport</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -1207,9 +1208,21 @@
                                             <span class="bt-type-badge bt-type-mobilizer">&#x1F4E3; Campaign Profile</span>
                                         </td>
                                         <td style="color:#ecfdf5; font-weight:700;">{{ citizen.full_name }}</td>
-                                        <td style="color:#6ee7b7;">{{ citizen.phone }}</td>
+                                        <td style="color:#6ee7b7;">{{ citizen.email }}</td>
                                         <td>
-                                            <span style="color:#a7f3d0; font-size:0.71rem;">{{ citizen.ward or 'Campaign ward pending' }}{% if citizen.pvc_number %}<br><span style="color:#065f46;">PVC: {{ citizen.pvc_number }}</span>{% endif %}</span>
+                                            <span style="color:#a7f3d0; font-size:0.71rem;">{{ citizen.pvc_number }}</span>
+                                        </td>
+                                        <td>
+                                            {% if citizen.passport_image %}
+                                                <a href="{{ url_for('admin_passport', filename=citizen.passport_image) }}"
+                                                   target="_blank"
+                                                   rel="noopener"
+                                                   style="color:#93c5fd;font-weight:700;text-decoration:none;">
+                                                    View
+                                                </a>
+                                            {% else %}
+                                                <span style="color:#065f46;font-size:0.71rem;">Pending</span>
+                                            {% endif %}
                                         </td>
                                         <td>
                                             {% if citizen.approved %}
@@ -1232,7 +1245,7 @@
                                     </tr>
                                     {% else %}
                                     <tr>
-                                        <td colspan="7" class="bt-empty">
+                                        <td colspan="8" class="bt-empty">
                                             &gt; No campaign profiles mapped in registry database yet.
                                         </td>
                                     </tr>
