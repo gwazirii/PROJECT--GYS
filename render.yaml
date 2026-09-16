@@ -4,11 +4,11 @@ services:
     runtime: python
     plan: free
 
-    buildCommand: npm install && npm run build && pip install -r requirements.txt
-    startCommand: gunicorn --chdir backend wsgi:application --bind 0.0.0.0:$PORT
+    buildCommand: npm install && npm run build && pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: gunicorn wsgi:application --bind 0.0.0.0:$PORT
 
     envVars:
       - key: PYTHON_VERSION
-        value: 3.14.3
+        value: 3.12.7
       - key: SECRET_KEY
-        sync: false
+        value: "change-me-in-render"
