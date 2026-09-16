@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>System Timeline Logs</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f4; padding: 30px; margin: 0; }
+        nav { background: #2e4d2e; padding: 15px; color: white; display: flex; justify-content: space-between; }
+        nav a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; }
+        .container { background: white; padding: 30px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    <nav>
+        <span>Timeline Archive</span>
+        <div>
+            <a href="{{ url_for('home') }}">Data Grid</a>
+            <a href="{{ url_for('chat') }}">Strategy Terminal</a>
+            <a href="{{ url_for('history') }}">Logs</a>
+            <a href="{{ url_for('logout') }}">Disconnect</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h2>Historical Context Records</h2>
+        <p>Operational data structures and timeline history are archived and verified under secure Board management parameters.</p>
+    </div>
+</body>
+</html>
