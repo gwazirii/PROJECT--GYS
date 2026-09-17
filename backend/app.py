@@ -432,7 +432,25 @@ def login():
     session['approved'] = bool(user.approved)
 
     _log('LOGIN', f'Campaign login: {user.full_name} (id={user.id})')
-    return redirect(url_for('dashboard'))
+    # After successful participant authentication, show a short synchronization
+    # screen before landing on the participant dashboard to match the GYS flow.
+    return redirect(url_for('participant_sync'))
+
+
+
+@app.route('/participant/sync')
+def participant_sync():
+    """Short synchronization screen shown to authenticated participants
+    prior to landing on the full participant dashboard."""
+    if session.get('user_type') != 'campaign' or not session.get('user_id'):
+        flash('Please log in to continue.')
+        return redirect(url_for('login'))
+
+    return render_template(
+        'participant_sync.html',
+        section='sync',
+        session=session,
+    )
 
 
 

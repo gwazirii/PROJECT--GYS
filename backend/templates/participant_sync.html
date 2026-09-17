@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GYS - Synchronizing account</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root{--gys-green:#228b22;--gys-yellow:#ffd700;--bg:#0b1220;--muted:#94a3b8}
+    body{margin:0;background:linear-gradient(180deg,#021018 0%,#071427 60%);color:#e6eef0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Segoe UI,Arial,sans-serif}
+    .sync-box{background:rgba(8,12,20,0.8);border:1px solid rgba(34,139,34,0.12);padding:28px;border-radius:10px;max-width:640px;width:92%;text-align:center}
+    .logo{height:96px;margin:0 auto 12px}
+    .title{font-weight:800;font-size:1.25rem;margin:6px 0}
+    .subtitle{color:var(--muted);font-size:0.92rem;margin-bottom:18px}
+    .progress{height:14px;border-radius:999px;background:#07202a}
+    .progress > .bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gys-green),var(--gys-yellow));width:0%;transition:width 120ms linear}
+  </style>
+</head>
+<body>
+  <main class="sync-box">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="GYS Logo" class="logo">
+    <div class="title">Synchronizing your account...</div>
+    <div class="subtitle">Preparing your participant portal — this should only take a moment.</div>
+
+    <div class="progress" aria-hidden="true"><div id="bar" class="bar"></div></div>
+    <div style="margin-top:12px;color:var(--muted);font-size:0.9rem" id="meta">Initializing...</div>
+  </main>
+
+  <script>
+    const bar = document.getElementById('bar');
+    const meta = document.getElementById('meta');
+    const steps = [20,55,85,100];
+    const labels = ['Loading profile','Verifying registration','Preparing dashboard','Complete'];
+    let p=0; let si=0;
+    const t = setInterval(()=>{
+      p = Math.min(100, p + Math.floor(Math.random()*8)+4);
+      bar.style.width = p + '%';
+      if(si < steps.length && p >= steps[si]){ meta.textContent = labels[si]; si++; }
+      if(p>=100){ clearInterval(t); setTimeout(()=>{ window.location.href = '/dashboard'; }, 900); }
+    },90);
+  </script>
+</body>
+</html>

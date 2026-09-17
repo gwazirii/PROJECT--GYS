@@ -12,58 +12,167 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/">GYS Participant Portal</a>
-            <div>
-                <a class="btn btn-outline-secondary" href="{{ url_for('logout') }}">Logout</a>
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="GYS" style="height:34px; margin-right:8px;">
+                <span class="fw-bold">GYS Youth Supporters</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About GYS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#activities">Activities</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#media">Media</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#submit">Submit Work</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#results">Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#leadership">Leadership</a></li>
+                </ul>
+
+                <form class="d-flex me-3" role="search" action="/">
+                    <input class="form-control form-control-sm me-2" type="search" placeholder="Search Platform..." aria-label="Search">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit">Search</button>
+                </form>
+
+                <div class="d-flex align-items-center">
+                    <a class="btn btn-outline-secondary btn-sm me-2" href="#account">My Account</a>
+                    <a class="btn btn-danger btn-sm" href="{{ url_for('logout') }}">Logout</a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="shell">
-        <div class="card profile-card p-4 mb-4">
-            <div class="d-flex align-items-center gap-3">
-                {% if user and user.passport_image %}
-                    <img src="{{ url_for('admin_passport', filename=user.passport_image) if session.get('user_type') == 'trustee' else url_for('static', filename='logo.png') }}" alt="avatar" style="width:72px; height:72px; object-fit:cover; border-radius:8px;">
-                {% else %}
-                    <div style="width:72px; height:72px; background:#e8f5e9; border-radius:8px;"></div>
-                {% endif %}
-                <div>
-                    <h3 class="mb-0">Welcome{% if session.get('user_name') %}, {{ session.get('user_name') }}{% endif %}</h3>
-                    <div class="text-muted small">Participant Dashboard</div>
+    <main class="container py-4">
+        <section id="home" class="mb-4">
+            <div class="d-flex flex-column flex-md-row align-items-start gap-3">
+                <div class="card p-3 flex-shrink-0" style="width:100%; max-width:320px;">
+                    <div class="text-center mb-3">
+                        {% if user and user.passport_image %}
+                            <img src="{{ url_for('admin_passport', filename=user.passport_image) if session.get('user_type') == 'trustee' else url_for('static', filename='logo.png') }}" alt="profile" style="width:120px;height:120px;object-fit:cover;border-radius:8px;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="placeholder" style="width:120px;height:120px;object-fit:contain;border-radius:8px;background:#f8fafc;padding:8px;">
+                        {% endif %}
+                    </div>
+                    <h4 class="h5">Welcome{% if session.get('user_name') %}, {{ session.get('user_name') }}{% endif %}</h4>
+                    <div class="text-muted small mb-2">GYS Youth Supporters Participant</div>
+                    <div class="mb-2">
+                        Registration Status: 
+                        {% if user and user.approved %}
+                            <span class="badge bg-success">Approved</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-muted small">Member since: {% if user and user.created_at %}{{ user.created_at.strftime('%Y-%m-%d') }}{% else %}Unavailable{% endif %}</div>
+                </div>
+
+                <div class="flex-grow-1">
+                    <div class="card p-3 mb-3">
+                        <h3 class="h6 mb-2">About GYS</h3>
+                        <p class="mb-1">To support responsible civic participation and strengthen coordinated youth mobilization across campaign areas.</p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6 class="mb-1">Our Vision</h6>
+                                <p class="small text-muted">Empowered youth leading informed civic engagement.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="mb-1">Our Mission</h6>
+                                <p class="small text-muted">Support civic participation and youth mobilization.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="mb-1">Aims</h6>
+                                <p class="small text-muted">Youth empowerment, community outreach, leadership development.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="activities" class="card p-3 mb-3">
+                        <h4 class="h6">Platform Activities</h4>
+                        <div class="row g-3 mt-2">
+                            <div class="col-sm-6 col-lg-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Technology Literacy Session</h5>
+                                        <p class="card-text small text-muted">Practical digital skills training for local youth.</p>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-lg-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Community Outreach</h5>
+                                        <p class="card-text small text-muted">Engaging local communities for civic education.</p>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="media" class="card p-3 mb-3">
+                        <h4 class="h6">Activity Videos</h4>
+                        <p class="small text-muted">Video library of recorded sessions and events.</p>
+                    </div>
+
+                    <div id="gallery" class="card p-3 mb-3">
+                        <h4 class="h6">Community Gallery</h4>
+                        <div class="row g-2">
+                            <div class="col-6 col-md-4"><img src="{{ url_for('static', filename='images/gallery-1.jpg') }}" class="img-fluid rounded" alt="gallery"></div>
+                            <div class="col-6 col-md-4"><img src="{{ url_for('static', filename='images/gallery-2.jpg') }}" class="img-fluid rounded" alt="gallery"></div>
+                        </div>
+                    </div>
+
+                    <div id="submit" class="card p-3 mb-3">
+                        <h4 class="h6">Submit Your Work</h4>
+                        <p class="small text-muted">Share approved work for review by the Board.</p>
+                        <a href="#" class="btn btn-sm btn-outline-success">Submit New</a>
+                    </div>
+
+                    <div id="results" class="card p-3 mb-3">
+                        <h4 class="h6">Results & Reports</h4>
+                        <p class="small text-muted">Official results and reports published by the Board.</p>
+                    </div>
+
+                    <div id="leadership" class="card p-3 mb-3">
+                        <h4 class="h6">Executive Leadership Council</h4>
+                        <div class="row g-3 mt-2">
+                            <div class="col-6 col-md-4 text-center">
+                                <img src="{{ url_for('static', filename='logo.png') }}" alt="leader" style="width:84px;height:84px;object-fit:cover;border-radius:999px;">
+                                <div class="mt-2"><strong>Gaddafi Ibrahim Waziri</strong><div class="small text-muted">Co-founder / Chairman</div></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <hr class="my-4">
-
-            <div class="row">
-                <div class="col-md-6">
-                    <h6>Account Information</h6>
-                    <ul class="list-unstyled">
-                        <li><strong>Name:</strong> {{ user.full_name if user else 'Unavailable' }}</li>
-                        <li><strong>Email:</strong> {{ user.email if user else 'Unavailable' }}</li>
-                        <li><strong>Username:</strong> {{ user.username if user else 'Unavailable' }}</li>
-                        <li><strong>Registration Status:</strong> {% if user and user.approved %}<span class="badge bg-success">Approved</span>{% else %}<span class="badge bg-warning text-dark">Pending</span>{% endif %}</li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <h6>Registration</h6>
-                    <ul class="list-unstyled">
-                        <li><strong>Registered On:</strong> {% if user and user.created_at %}{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}{% else %}Unavailable{% endif %}</li>
-                        <li class="text-muted small">PVC numbers are not displayed here for privacy.</li>
-                    </ul>
+        <section id="account" class="mb-4">
+            <div class="card p-3">
+                <h4 class="h6">My Account</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><strong>Full Name:</strong> {{ user.full_name if user else 'Unavailable' }}</li>
+                            <li><strong>Email:</strong> {{ user.email if user else 'Unavailable' }}</li>
+                            <li><strong>Username:</strong> {{ user.username if user else 'Unavailable' }}</li>
+                            <li><strong>Registration Status:</strong> {% if user and user.approved %}<span class="badge bg-success">Approved</span>{% else %}<span class="badge bg-warning text-dark">Pending</span>{% endif %}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="small text-muted">Your PVC number is protected for privacy and will not be displayed here.</p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="card p-3">
-            <h5>Quick Actions</h5>
-            <div class="mt-2">
-                <a class="btn btn-success me-2" href="/home">Main Dashboard</a>
-                <a class="btn btn-outline-secondary" href="{{ url_for('logout') }}">Logout</a>
-            </div>
-        </div>
+        <footer class="text-center text-muted small mt-4">&copy; GYS Youth Supporters</footer>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
