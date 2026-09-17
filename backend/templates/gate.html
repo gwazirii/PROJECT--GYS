@@ -247,9 +247,11 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid px-4">
             <a class="navbar-brand" href="{{ url_for('gate') }}">GRA Youth Supporters</a>
-            <div class="ms-auto d-flex align-items-center" style="gap:12px;">
+            <div class="d-flex align-items-center ms-auto" style="gap:14px;">
+                <a class="nav-link small" href="{{ url_for('gate') }}">Home</a>
+                <a class="nav-link small" href="#campaign-registration">Campaign Registration</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-success btn-sm">Participant Login</a>
                 <a href="{{ url_for('admin_login') }}" class="btn btn-outline-dark btn-sm">Board Member Login</a>
-                <span class="text-secondary small font-monospace">Campaign Portal</span>
             </div>
         </div>
     </nav>
@@ -289,7 +291,7 @@
             </aside>
 
             <section class="col-lg-4">
-                <section class="portal-panel registration-card">
+                <section class="portal-panel registration-card" id="campaign-registration">
                     <div class="registration-heading">
                         <h1>Campaign Registration</h1>
                         <p>Register as a GRA Youth Supporters campaign participant.</p>
@@ -392,8 +394,13 @@
                             By submitting this form, you consent to the collection and processing of the information provided for campaign registration and administration. Your information will be handled securely and will not be displayed publicly.
                         </p>
 
-                        <button type="submit" class="btn-register" id="register-button">Register</button>
                     </form>
+                </section>
+
+                <section class="portal-panel mt-3 text-center">
+                    <h3 class="section-title">Already Registered?</h3>
+                    <p class="body-copy">Sign in to access your personal GYS Youth Supporters dashboard.</p>
+                    <a href="{{ url_for('login') }}" class="btn btn-success" style="min-width:200px;">Participant Login</a>
                 </section>
             </section>
 
