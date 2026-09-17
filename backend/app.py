@@ -435,6 +435,13 @@ def login():
     return redirect(url_for('dashboard'))
 
 
+
+@app.route('/admin/login', methods=['GET'])
+def admin_login():
+    """Render the board member/admin login terminal page."""
+    return render_template('admin_login.html', session=session)
+
+
 # ─────────────────────────────────────────────
 # 8.  Trustee login  →  /trustee/login
 #     Sets user_type: 'trustee'
