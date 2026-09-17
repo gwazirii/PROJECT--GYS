@@ -43,6 +43,7 @@
                     <ul class="list-unstyled">
                         <li><strong>Name:</strong> {{ user.full_name if user else 'Unavailable' }}</li>
                         <li><strong>Email:</strong> {{ user.email if user else 'Unavailable' }}</li>
+                        <li><strong>Username:</strong> {{ user.username if user else 'Unavailable' }}</li>
                         <li><strong>Registration Status:</strong> {% if user and user.approved %}<span class="badge bg-success">Approved</span>{% else %}<span class="badge bg-warning text-dark">Pending</span>{% endif %}</li>
                     </ul>
                 </div>

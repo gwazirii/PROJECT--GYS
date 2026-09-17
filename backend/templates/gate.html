@@ -319,6 +319,19 @@
                         </div>
 
                         <div class="field-group">
+                            <label class="form-label" for="username">Username <span class="required">*</span></label>
+                            <input type="text"
+                                   id="username"
+                                   name="username"
+                                   class="form-control"
+                                   minlength="3"
+                                   maxlength="80"
+                                   autocomplete="username"
+                                   required>
+                            <span class="field-hint">Your username and password will be used to access your personal GYS dashboard.</span>
+                        </div>
+
+                        <div class="field-group">
                             <label class="form-label" for="pvcNumber">PVC / Voter Identification Number <span class="required">*</span></label>
                             <input type="text"
                                    id="pvcNumber"
@@ -334,24 +347,30 @@
 
                         <div class="field-group">
                             <label class="form-label" for="password">Password <span class="required">*</span></label>
-                            <input type="password"
-                                   id="password"
-                                   name="password"
-                                   class="form-control"
-                                   minlength="8"
-                                   autocomplete="new-password"
-                                   required>
+                            <div style="position:relative;">
+                                <input type="password"
+                                       id="password"
+                                       name="password"
+                                       class="form-control"
+                                       minlength="8"
+                                       autocomplete="new-password"
+                                       required>
+                                <button type="button" id="togglePw" class="btn btn-sm btn-outline-secondary" style="position:absolute; right:8px; top:8px;">Show</button>
+                            </div>
                         </div>
 
                         <div class="field-group">
                             <label class="form-label" for="confirmPassword">Confirm Password <span class="required">*</span></label>
-                            <input type="password"
-                                   id="confirmPassword"
-                                   name="confirm_password"
-                                   class="form-control"
-                                   minlength="8"
-                                   autocomplete="new-password"
-                                   required>
+                            <div style="position:relative;">
+                                <input type="password"
+                                       id="confirmPassword"
+                                       name="confirm_password"
+                                       class="form-control"
+                                       minlength="8"
+                                       autocomplete="new-password"
+                                       required>
+                                <button type="button" id="toggleCpw" class="btn btn-sm btn-outline-secondary" style="position:absolute; right:8px; top:8px;">Show</button>
+                            </div>
                             <span class="field-hint">Passwords must match and be at least 8 characters.</span>
                         </div>
 
@@ -415,6 +434,15 @@
                 }
                 button.disabled = true;
                 button.textContent = 'Registering...';
+            });
+
+            document.getElementById('togglePw').addEventListener('click', function(){
+                var el = document.getElementById('password');
+                if(el.type === 'password'){ el.type = 'text'; this.textContent = 'Hide'; } else { el.type = 'password'; this.textContent = 'Show'; }
+            });
+            document.getElementById('toggleCpw').addEventListener('click', function(){
+                var el = document.getElementById('confirmPassword');
+                if(el.type === 'password'){ el.type = 'text'; this.textContent = 'Hide'; } else { el.type = 'password'; this.textContent = 'Show'; }
             });
         })();
     </script>

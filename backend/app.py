@@ -77,6 +77,7 @@ class Citizen(db.Model):
     id           = db.Column(db.Integer, primary_key=True)
     full_name    = db.Column(db.String(150), nullable=False)
     phone        = db.Column(db.String(50),  unique=True, nullable=False)
+    username     = db.Column(db.String(80), nullable=True)
     reg_type     = db.Column(db.String(50),  nullable=False)   # General for campaign registrations
     password     = db.Column(db.String(256), nullable=False)
     ward         = db.Column(db.String(100), nullable=True)
@@ -138,12 +139,14 @@ def _ensure_schema_columns() -> None:
             'passport_image': 'ALTER TABLE citizen ADD COLUMN IF NOT EXISTS passport_image VARCHAR(255)',
             'created_at': 'ALTER TABLE citizen ADD COLUMN IF NOT EXISTS created_at TIMESTAMP',
             'updated_at': 'ALTER TABLE citizen ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP',
+            'username': 'ALTER TABLE citizen ADD COLUMN IF NOT EXISTS username VARCHAR(80)',
         }
     else:
         statements = {
             'passport_image': 'ALTER TABLE citizen ADD COLUMN passport_image VARCHAR(255)',
             'created_at': 'ALTER TABLE citizen ADD COLUMN created_at DATETIME',
             'updated_at': 'ALTER TABLE citizen ADD COLUMN updated_at DATETIME',
+            'username': 'ALTER TABLE citizen ADD COLUMN username VARCHAR(80)',
         }
 
     for column_name, statement in statements.items():
@@ -216,6 +219,7 @@ _PUBLIC_ENDPOINTS = {
     'mobilization_register',
     'mobilization_login',
     'login',
+    'registration_success',
     'trustee_login',
     'static',
 }
@@ -267,6 +271,7 @@ def mobilization_register():
     email = _normalize_email(request.form.get('email'))
     pvc_number = _normalize_pvc_number(request.form.get('pvcNumber') or request.form.get('pvc_number'))
     passport = request.files.get('passport')
+    username = (request.form.get('username') or '').strip()
     password = request.form.get('password', '')
     confirm = request.form.get('confirm_password', '')
 
@@ -292,6 +297,24 @@ def mobilization_register():
         flash('Password must be at least 8 characters long.')
         return redirect(url_for('gate'))
 
+    if not username or len(username) < 3:
+        flash('Username is required and must be at least 3 characters.')
+        return redirect(url_for('gate'))
+
+    # Check for duplicate username or email
+    existing_user = Citizen.query.filter(or_(func.lower(Citizen.email) == email, func.lower(Citizen.username) == username.lower())).first()
+    if existing_user:
+        # Determine which field conflicts and show a safe message
+        if existing_user.username and existing_user.username.lower() == username.lower():
+            flash('This username is already in use. Please choose another username.')
+        else:
+            flash('This email address is already registered. If this is your account, try signing in or use password recovery.')
+        try:
+            (PASSPORT_UPLOAD_DIR / passport_result).unlink(missing_ok=True)
+        except Exception:
+            pass
+        return redirect(url_for('gate'))
+
     is_valid_passport, passport_result = _validate_passport_upload(passport)
     if not is_valid_passport:
         flash(passport_result)
@@ -313,6 +336,7 @@ def mobilization_register():
         reg_type='General',
         full_name=full_name,
         email=email,
+        username=username,
         pvc_number=pvc_number,
         passport_image=passport_result,
         phone=f'campaign:{secrets.token_hex(12)}',
@@ -325,8 +349,13 @@ def mobilization_register():
     db.session.commit()
     _log('REGISTER', f'Campaign registration submitted: {full_name} (id={mobilizer.id})')
 
-    flash('Registration Successful|Your campaign registration has been submitted successfully. You may now log in.')
-    return redirect(url_for('login'))
+    flash('Registration Successful|Your campaign registration and account have been created successfully.')
+    return redirect(url_for('registration_success'))
+
+
+@app.route('/registration/success')
+def registration_success():
+    return render_template('registration_success.html')
 
 
 # ─────────────────────────────────────────────
@@ -379,14 +408,14 @@ def login():
     if request.method == 'GET':
         return render_template('login.html', session=session)
 
-    pvc = _normalize_pvc_number(request.form.get('pvc') or request.form.get('pvcNumber') or '')
+    username = (request.form.get('username') or '').strip()
     password = request.form.get('password', '')
 
-    if not pvc or not password:
-        flash('Please provide your PVC number and password.')
+    if not username or not password:
+        flash('Please provide your username and password.')
         return redirect(url_for('login'))
 
-    user = Citizen.query.filter_by(pvc_number=pvc, reg_type='General').first()
+    user = Citizen.query.filter(func.lower(Citizen.username) == username.lower(), Citizen.reg_type == 'General').first()
     if not user or not _verify(user.password, password):
         flash('Invalid username or password.')
         return redirect(url_for('login'))
