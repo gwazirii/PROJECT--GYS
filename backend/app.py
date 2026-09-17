@@ -215,6 +215,7 @@ _PUBLIC_ENDPOINTS = {
     'gate',
     'mobilization_register',
     'mobilization_login',
+    'login',
     'trustee_login',
     'static',
 }
@@ -227,6 +228,10 @@ def require_authentication():
     if request.endpoint in _PUBLIC_ENDPOINTS:
         return  # allow through
     if 'user_type' not in session:
+        # If the user is trying to access the dashboard, send them to the participant login
+        if request.endpoint == 'dashboard' or request.path.startswith('/dashboard'):
+            flash('Please log in to continue.')
+            return redirect(url_for('login'))
         flash('Please log in to continue.')
         return redirect(url_for('gate'))
 
@@ -262,6 +267,8 @@ def mobilization_register():
     email = _normalize_email(request.form.get('email'))
     pvc_number = _normalize_pvc_number(request.form.get('pvcNumber') or request.form.get('pvc_number'))
     passport = request.files.get('passport')
+    password = request.form.get('password', '')
+    confirm = request.form.get('confirm_password', '')
 
     if len(full_name) < 3:
         flash('Full Name is required and must be at least 3 characters.')
@@ -271,6 +278,18 @@ def mobilization_register():
         return redirect(url_for('gate'))
     if not _is_valid_pvc_number(pvc_number):
         flash('PVC / Voter Identification Number is required and must use only letters, numbers, hyphens, or slashes.')
+        return redirect(url_for('gate'))
+
+    if not password or not confirm:
+        flash('Password and Confirm Password are required.')
+        return redirect(url_for('gate'))
+
+    if password != confirm:
+        flash('Passwords do not match. Please check and try again.')
+        return redirect(url_for('gate'))
+
+    if len(password) < 8:
+        flash('Password must be at least 8 characters long.')
         return redirect(url_for('gate'))
 
     is_valid_passport, passport_result = _validate_passport_upload(passport)
@@ -297,7 +316,7 @@ def mobilization_register():
         pvc_number=pvc_number,
         passport_image=passport_result,
         phone=f'campaign:{secrets.token_hex(12)}',
-        password=_hash(secrets.token_urlsafe(32)),
+        password=_hash(password),
         approved=False,
         created_at=now,
         updated_at=now,
@@ -306,8 +325,8 @@ def mobilization_register():
     db.session.commit()
     _log('REGISTER', f'Campaign registration submitted: {full_name} (id={mobilizer.id})')
 
-    flash('Registration Successful|Your campaign registration has been submitted successfully.')
-    return redirect(url_for('gate') + '?registered=1')
+    flash('Registration Successful|Your campaign registration has been submitted successfully. You may now log in.')
+    return redirect(url_for('login'))
 
 
 # ─────────────────────────────────────────────
@@ -352,6 +371,38 @@ def mobilization_login():
 
     _log('LOGIN', f'Campaign login: {user.full_name} (id={user.id})')
     return redirect(url_for('home'))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Campaign participant login using PVC / Voter Identification Number."""
+    if request.method == 'GET':
+        return render_template('login.html', session=session)
+
+    pvc = _normalize_pvc_number(request.form.get('pvc') or request.form.get('pvcNumber') or '')
+    password = request.form.get('password', '')
+
+    if not pvc or not password:
+        flash('Please provide your PVC number and password.')
+        return redirect(url_for('login'))
+
+    user = Citizen.query.filter_by(pvc_number=pvc, reg_type='General').first()
+    if not user or not _verify(user.password, password):
+        flash('Invalid username or password.')
+        return redirect(url_for('login'))
+
+    if not user.approved:
+        flash('Campaign profile pending approval. Contact your board trustee.')
+        return redirect(url_for('login'))
+
+    session.clear()
+    session['user_type'] = 'campaign'
+    session['user_name'] = user.full_name
+    session['user_id'] = user.id
+    session['approved'] = bool(user.approved)
+
+    _log('LOGIN', f'Campaign login: {user.full_name} (id={user.id})')
+    return redirect(url_for('dashboard'))
 
 
 # ─────────────────────────────────────────────
@@ -452,7 +503,23 @@ def admin_dashboard():
 # Legacy alias kept so existing nav links (/dashboard) still resolve
 @app.route('/dashboard')
 def dashboard():
-    return redirect(url_for('admin_dashboard'))
+    # Route acts as role-aware dashboard landing.
+    if session.get('user_type') == 'trustee':
+        return redirect(url_for('admin_dashboard'))
+
+    if session.get('user_type') == 'campaign':
+        user = None
+        if session.get('user_id'):
+            user = Citizen.query.get(session.get('user_id'))
+        return render_template(
+            'participant_dashboard.html',
+            session=session,
+            user=user,
+        )
+
+    # Default for unauthenticated: send to login
+    flash('Please log in to continue.')
+    return redirect(url_for('login'))
 
 
 @app.route('/admin/approve/<int:citizen_id>')
@@ -516,9 +583,25 @@ def history():
 
 @app.route('/logout')
 def logout():
+    prev_type = session.get('user_type')
     session.clear()
     flash('Session closed. Secure node detached.')
+    if prev_type == 'campaign':
+        return redirect(url_for('login'))
     return redirect(url_for('gate'))
+
+
+@app.after_request
+def set_response_headers(response):
+    # Prevent caching of authenticated pages so back-button cannot expose data
+    try:
+        if session.get('user_type'):
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+    except Exception:
+        pass
+    return response
 
 
 # ─────────────────────────────────────────────

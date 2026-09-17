@@ -333,6 +333,29 @@
                         </div>
 
                         <div class="field-group">
+                            <label class="form-label" for="password">Password <span class="required">*</span></label>
+                            <input type="password"
+                                   id="password"
+                                   name="password"
+                                   class="form-control"
+                                   minlength="8"
+                                   autocomplete="new-password"
+                                   required>
+                        </div>
+
+                        <div class="field-group">
+                            <label class="form-label" for="confirmPassword">Confirm Password <span class="required">*</span></label>
+                            <input type="password"
+                                   id="confirmPassword"
+                                   name="confirm_password"
+                                   class="form-control"
+                                   minlength="8"
+                                   autocomplete="new-password"
+                                   required>
+                            <span class="field-hint">Passwords must match and be at least 8 characters.</span>
+                        </div>
+
+                        <div class="field-group">
                             <label class="form-label" for="passport">Passport Photograph <span class="required">*</span></label>
                             <input type="file"
                                    id="passport"
@@ -377,8 +400,19 @@
         (function () {
             var form = document.getElementById('campaign-registration-form');
             var button = document.getElementById('register-button');
-
-            form.addEventListener('submit', function () {
+            form.addEventListener('submit', function (e) {
+                var pw = document.getElementById('password').value || '';
+                var cpw = document.getElementById('confirmPassword').value || '';
+                if (pw.length < 8) {
+                    e.preventDefault();
+                    alert('Password must be at least 8 characters long.');
+                    return false;
+                }
+                if (pw !== cpw) {
+                    e.preventDefault();
+                    alert('Passwords do not match.');
+                    return false;
+                }
                 button.disabled = true;
                 button.textContent = 'Registering...';
             });

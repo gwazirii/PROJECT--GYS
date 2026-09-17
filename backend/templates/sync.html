@@ -120,21 +120,24 @@
 </head>
 <body>
     <main class="sync-terminal text-center">
-        <div class="terminal-kicker">Board Authentication Bridge</div>
-        <h1 class="terminal-title">Decrypting Administrative Session</h1>
-        <p class="terminal-subtitle">Synchronizing trustee credentials with the GYS registry command layer.</p>
+        <div class="terminal-kicker">Board Authorization</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="GYS Logo" id="syncLogo" style="width:120px;height:120px;object-fit:contain;">
+            <h1 class="terminal-title" id="syncTitle">Synchronizing Board Authorization...</h1>
+            <p class="terminal-subtitle">Verifying trustee access and preparing command central.</p>
+        </div>
 
         <div class="progress-shell">
             <div id="progressFill" class="progress-fill"></div>
         </div>
 
         <div class="progress-meta">
-            <span><span class="status-dot"></span><span id="statusText">Initializing decryption</span></span>
+            <span><span class="status-dot"></span><span id="statusText">Starting synchronization</span></span>
             <span id="progressPercent">0%</span>
         </div>
 
         <div id="logWindow" class="log-window text-start">
-            <span class="log-line">&gt; Opening encrypted board terminal channel...</span>
+            <span class="log-line">&gt; Preparing authorization sequence...</span>
         </div>
     </main>
 
@@ -145,12 +148,10 @@
         const logWindow = document.getElementById('logWindow');
 
         const checkpoints = [
-            { pct: 12, status: 'Validating access token', log: '> Decrypting trustee passcode signature...' },
-            { pct: 28, status: 'Reading registry index', log: '> Loading protected citizen table references...' },
-            { pct: 46, status: 'Unlocking dashboard route', log: '> Decrypting administrative route permissions...' },
-            { pct: 64, status: 'Verifying database session', log: '> Matching approval keys against registry state...' },
-            { pct: 82, status: 'Compiling command view', log: '> Preparing Board Command Central interface...' },
-            { pct: 100, status: 'Access granted', log: '> Decryption complete. Redirecting to dashboard...' }
+            { pct: 20, status: 'Synchronizing Board Authorization...', log: '> Establishing trustee session...' },
+            { pct: 50, status: 'Verifying Trustee Access...', log: '> Confirming trustee credentials...' },
+            { pct: 85, status: 'Finalising interface', log: '> Preparing Board Command Central...' },
+            { pct: 100, status: 'Access Granted', log: '> Authorization complete. Redirecting...' }
         ];
 
         let progress = 0;
@@ -170,11 +171,20 @@
 
             if (progress >= 100) {
                 clearInterval(timer);
+                // Smoothly stop logo rotation and redirect once done
+                document.getElementById('syncLogo').style.transition = 'transform 0.8s ease-out';
+                document.getElementById('syncLogo').style.transform = 'rotate(0deg)';
                 setTimeout(() => {
                     window.location.href = '/admin/dashboard';
                 }, 900);
             }
         }, 80);
+
+        // Continuous rotation effect tied to progress
+        setInterval(() => {
+            const angle = (Date.now() / 50) % 360;
+            document.getElementById('syncLogo').style.transform = `rotate(${angle}deg)`;
+        }, 40);
     </script>
 </body>
 </html>
