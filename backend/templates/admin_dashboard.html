@@ -36,7 +36,8 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                 <li class="nav-item"><a class="nav-link" href="/dashboard">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="#registry">Campaign Registrations</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                <li class="nav-item"><span class="nav-link">{{ session.get('user_name', 'Board Member') }}</span></li>
+                <li class="nav-item"><a class="nav-link text-danger fw-bold" href="{{ url_for('logout') }}">Sign Out</a></li>
             </ul>
         </div>
     </nav>

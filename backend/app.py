@@ -220,6 +220,7 @@ _PUBLIC_ENDPOINTS = {
     'mobilization_login',
     'login',
     'registration_success',
+    'admin_login',
     'trustee_login',
     'static',
 }
@@ -504,7 +505,7 @@ def sync_processing_gate():
     command central dashboard loads."""
     if not session.get('is_admin'):
         flash('Authentication token missing. Please use the terminal gate.')
-        return redirect(url_for('gate'))
+        return redirect(url_for('admin_login'))
 
     return render_template(
         'sync.html',
@@ -518,7 +519,7 @@ def admin_dashboard():
     """Board command central — trustee-only view."""
     if session.get('user_type') != 'trustee':
         flash('Restricted path. Board trustee authorisation required.')
-        return redirect(url_for('gate'))
+        return redirect(url_for('admin_login'))
 
     citizens = Citizen.query.filter_by(reg_type='General').order_by(Citizen.created_at.desc(), Citizen.id.desc()).all()
     return render_template(
