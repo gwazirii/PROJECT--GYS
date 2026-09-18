@@ -268,48 +268,9 @@ def _default_public_cards():
             'Campaign logistics and volunteer coordination',
             'Media, results, and transparent reporting'
         ],
-        'activities': [
-            {
-                'title': 'Youth Leadership Forum',
-                'date': '15 May 2026',
-                'location': 'Bauchi',
-                'description': 'A civic leadership session focused on community service, accountability, and youth participation.'
-            },
-            {
-                'title': 'Community Mobilization Drive',
-                'date': '22 June 2026',
-                'location': 'Yelwa',
-                'description': 'Volunteer outreach to strengthen civic awareness and grassroots participation.'
-            },
-            {
-                'title': 'Media & Digital Skills Session',
-                'date': '08 July 2026',
-                'location': 'GRA Hub',
-                'description': 'Training on digital storytelling, campaign communication, and effective youth engagement.'
-            }
-        ],
-        'media': [
-            {
-                'title': 'Volunteer Engagement Highlights',
-                'category': 'Campaign',
-                'caption': 'Snapshots from the local outreach program.',
-                'date': '26 May 2026'
-            },
-            {
-                'title': 'Digital Literacy Session',
-                'category': 'Training',
-                'caption': 'Participants learning practical digital communication tools.',
-                'date': '10 June 2026'
-            }
-        ],
-        'results': [
-            {
-                'title': 'Ward Outreach Summary',
-                'date': '01 August 2026',
-                'description': 'A verified community engagement report highlighting participation and outreach progress.',
-                'category': 'Report'
-            }
-        ],
+        'activities': [],
+        'media': [],
+        'results': [],
         'leadership': [
             {
                 'name': 'Gaddafi Ibrahim Waziri',
@@ -318,97 +279,45 @@ def _default_public_cards():
                 'photo': 'gaddafi.jpg'
             },
             {
-                'name': 'Abdullahi Sadiq',
+                'name': 'Abdullahi Shehu',
                 'title': 'Executive Member',
                 'bio': 'Supports grassroots mobilization and community relationship-building.',
                 'photo': 'abdullahi.jpg'
             }
         ],
-        'candidates': [
-            {
-                'name': 'Candidate Spotlight',
-                'party': 'GYS Platform',
-                'office': 'Youth Leadership Representative',
-                'constituency': 'Statewide',
-                'year': '2027'
-            }
-        ]
+        'candidates': []
     }
 
 
 def _default_dashboard_activity_items():
-    return [
-        {
-            'title': 'Youth Leadership Forum',
-            'date': '15 May 2026',
-            'location': 'Bauchi',
-            'description': 'A civic leadership discussion focused on service, accountability, and youth participation.'
-        },
-        {
-            'title': 'Community Mobilization Drive',
-            'date': '22 June 2026',
-            'location': 'Yelwa',
-            'description': 'Volunteer outreach aimed at strengthening local civic engagement and awareness.'
-        },
-        {
-            'title': 'Media & Digital Skills Session',
-            'date': '08 July 2026',
-            'location': 'GRA Hub',
-            'description': 'A practical training on storytelling, digital communication, and campaign visibility.'
-        }
-    ]
+    return []
 
 
 def _default_media_items():
-    return [
-        {
-            'title': 'Volunteer Engagement Highlights',
-            'category': 'Campaign',
-            'caption': 'Highlights from the local outreach program.',
-            'date': '26 May 2026',
-            'image_url': '/static/images/abdullahi.jpg'
-        },
-        {
-            'title': 'Digital Literacy Session',
-            'category': 'Training',
-            'caption': 'Participants learning practical digital communication tools.',
-            'date': '10 June 2026',
-            'image_url': '/static/images/gaddafi.jpg'
-        }
-    ]
+    return []
 
 
 def _default_gallery_items():
-    return [
-        {'title': 'Community Outreach', 'category': 'Outreach', 'caption': 'Grassroots engagement activity', 'date': '26 May 2026', 'image_url': '/static/images/abdullahi.jpg'},
-        {'title': 'Leadership Session', 'category': 'Leadership', 'caption': 'Youth leadership engagement', 'date': '21 June 2026', 'image_url': '/static/images/gaddafi.jpg'}
-    ]
+    return []
 
 
 def _default_submissions():
-    return [
-        {'title': 'Volunteer Stories', 'status': 'Pending', 'category': 'Community', 'description': 'Short stories of citizen engagement and community work.'},
-        {'title': 'Outreach Photo Report', 'status': 'Reviewed', 'category': 'Media', 'description': 'Documentation of the latest community outreach drive.'}
-    ]
+    return []
 
 
 def _default_results():
-    return [
-        {'title': 'Ward Outreach Summary', 'category': 'Report', 'status': 'Published', 'date': '01 August 2026', 'description': 'A community mobilization report completed and verified by the board.'}
-    ]
+    return []
 
 
 def _default_leadership_members():
     return [
         {'full_name': 'Gaddafi Ibrahim Waziri', 'title': 'Co-founder / Chairman', 'biography': 'Strategic leader supporting youth participation and civic advancement.', 'photo_url': '/static/images/gaddafi.jpg'},
-        {'full_name': 'Abdullahi Sadiq', 'title': 'Executive Member', 'biography': 'Focused on grassroots engagement, member support, and community mobilization.', 'photo_url': '/static/images/abdullahi.jpg'}
+        {'full_name': 'Abdullahi Shehu', 'title': 'Executive Member', 'biography': 'Focused on grassroots engagement, member support, and community mobilization.', 'photo_url': '/static/images/abdullahi.jpg'}
     ]
 
 
 def _default_candidates():
-    return [
-        {'full_name': 'Candidate Spotlight', 'party': 'GYS Platform', 'office': 'Youth Leadership Representative', 'constituency': 'Statewide', 'election_year': '2027'}
-    ]
+    return []
 
 
 def _normalize_pvc_number(value: str) -> str:
@@ -515,12 +424,13 @@ def gate():
 
 @app.route('/mobilization/register', methods=['POST'])
 def mobilization_register():
-    """Campaign registration accepting only fullName/email/pvcNumber/passport."""
+    """Campaign registration using a PVC-based identifier and a secure password."""
     full_name = _normalize_name(request.form.get('fullName') or request.form.get('full_name'))
     email = _normalize_email(request.form.get('email'))
     pvc_number = _normalize_pvc_number(request.form.get('pvcNumber') or request.form.get('pvc_number'))
     passport = request.files.get('passport')
-    username = (request.form.get('username') or '').strip()
+    provided_username = (request.form.get('username') or '').strip()
+    username = provided_username or pvc_number
     password = request.form.get('password', '')
     confirm = request.form.get('confirm_password', '')
 
@@ -547,21 +457,7 @@ def mobilization_register():
         return redirect(url_for('gate'))
 
     if not username or len(username) < 3:
-        flash('Username is required and must be at least 3 characters.')
-        return redirect(url_for('gate'))
-
-    # Check for duplicate username or email
-    existing_user = Citizen.query.filter(or_(func.lower(Citizen.email) == email, func.lower(Citizen.username) == username.lower())).first()
-    if existing_user:
-        # Determine which field conflicts and show a safe message
-        if existing_user.username and existing_user.username.lower() == username.lower():
-            flash('This username is already in use. Please choose another username.')
-        else:
-            flash('This email address is already registered. If this is your account, try signing in or use password recovery.')
-        try:
-            (PASSPORT_UPLOAD_DIR / passport_result).unlink(missing_ok=True)
-        except Exception:
-            pass
+        flash('PVC / Username is required and must be at least 3 characters.')
         return redirect(url_for('gate'))
 
     is_valid_passport, passport_result = _validate_passport_upload(passport)
@@ -570,14 +466,23 @@ def mobilization_register():
         return redirect(url_for('gate'))
 
     duplicate = Citizen.query.filter(Citizen.reg_type == 'General').filter(
-        or_(func.lower(Citizen.email) == email, Citizen.pvc_number == pvc_number)
+        or_(
+            func.lower(Citizen.email) == email,
+            func.lower(Citizen.pvc_number) == pvc_number.lower(),
+            func.lower(Citizen.username) == username.lower(),
+        )
     ).first()
     if duplicate:
         try:
             (PASSPORT_UPLOAD_DIR / passport_result).unlink(missing_ok=True)
         except OSError:
             pass
-        flash('This information has already been registered.')
+        if duplicate.pvc_number and duplicate.pvc_number.lower() == pvc_number.lower():
+            flash('This PVC number is already registered. Please use your account to sign in.')
+        elif duplicate.username and duplicate.username.lower() == username.lower():
+            flash('This PVC/username is already in use. Please choose a different identifier.')
+        else:
+            flash('This information has already been registered.')
         return redirect(url_for('gate'))
 
     now = datetime.utcnow()
@@ -653,20 +558,25 @@ def mobilization_login():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Campaign participant login using PVC / Voter Identification Number."""
+    """Campaign participant login using PVC or username plus password."""
     if request.method == 'GET':
         return render_template('login.html', session=session)
 
-    username = (request.form.get('username') or '').strip()
+    identifier = (request.form.get('username') or '').strip()
     password = request.form.get('password', '')
 
-    if not username or not password:
-        flash('Please provide your username and password.')
+    if not identifier or not password:
+        flash('Please provide your PVC or username and password.')
         return redirect(url_for('login'))
 
-    user = Citizen.query.filter(func.lower(Citizen.username) == username.lower(), Citizen.reg_type == 'General').first()
+    user = Citizen.query.filter(Citizen.reg_type == 'General').filter(
+        or_(
+            func.lower(Citizen.username) == identifier.lower(),
+            func.lower(Citizen.pvc_number) == identifier.lower(),
+        )
+    ).first()
     if not user or not _verify(user.password, password):
-        flash('Invalid username or password.')
+        flash('Invalid PVC/username or password.')
         return redirect(url_for('login'))
 
     if not user.approved:
@@ -680,8 +590,6 @@ def login():
     session['approved'] = bool(user.approved)
 
     _log('LOGIN', f'Campaign login: {user.full_name} (id={user.id})')
-    # After successful participant authentication, show a short synchronization
-    # screen before landing on the participant dashboard to match the GYS flow.
     return redirect(url_for('participant_sync'))
 
 
