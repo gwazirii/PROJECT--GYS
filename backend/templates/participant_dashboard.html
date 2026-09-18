@@ -6,9 +6,14 @@
     <title>Participant Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f5; }
-        .shell { max-width: 980px; margin: 36px auto; }
-        .profile-card { border-radius: 10px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f5; color: #0f172a; }
+        .navbar-brand { color: #1b5e20 !important; font-weight: 800; }
+        .stat-card { border: 1px solid #dfe7df; border-radius: 12px; background: #fff; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04); }
+        .section-card { border: 1px solid #e2e8f0; background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04); }
+        .badge-green { background: #e8f5e9; color: #1b5e20; }
+        .badge-gold { background: #fff8d8; color: #8a6d00; }
+        .nav-link { font-weight: 600; }
+        .mini-avatar { width: 72px; height: 72px; object-fit: cover; border-radius: 50%; border: 2px solid #dfe7df; }
     </style>
 </head>
 <body>
@@ -16,7 +21,7 @@
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="/">
                 <img src="{{ url_for('static', filename='logo.png') }}" alt="GYS" style="height:34px; margin-right:8px;">
-                <span class="fw-bold">GYS Youth Supporters</span>
+                <span>GYS Youth Supporters</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -27,16 +32,14 @@
                     <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="#about">About GYS</a></li>
                     <li class="nav-item"><a class="nav-link" href="#activities">Activities</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#media">Media</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#media">Media & Videos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#gallery">Community Gallery</a></li>
                     <li class="nav-item"><a class="nav-link" href="#submit">Submit Work</a></li>
                     <li class="nav-item"><a class="nav-link" href="#results">Results</a></li>
                     <li class="nav-item"><a class="nav-link" href="#leadership">Leadership</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#account">My Account</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#candidates">Candidates</a></li>
                 </ul>
-
-                <form class="d-flex me-3" role="search" action="/">
-                    <input class="form-control form-control-sm me-2" type="search" placeholder="Search Platform..." aria-label="Search">
-                    <button class="btn btn-sm btn-outline-secondary" type="submit">Search</button>
-                </form>
 
                 <div class="d-flex align-items-center">
                     <a class="btn btn-outline-secondary btn-sm me-2" href="#account">My Account</a>
@@ -49,10 +52,10 @@
     <main class="container py-4">
         <section id="home" class="mb-4">
             <div class="d-flex flex-column flex-md-row align-items-start gap-3">
-                <div class="card p-3 flex-shrink-0" style="width:100%; max-width:320px;">
+                <div class="section-card p-3 flex-shrink-0" style="width:100%; max-width:320px;">
                     <div class="text-center mb-3">
                         {% if user and user.passport_image %}
-                            <img src="{{ url_for('admin_passport', filename=user.passport_image) if session.get('user_type') == 'trustee' else url_for('static', filename='logo.png') }}" alt="profile" style="width:120px;height:120px;object-fit:cover;border-radius:8px;">
+                            <img src="{{ url_for('static', filename='logo.png') }}" alt="profile" style="width:120px;height:120px;object-fit:cover;border-radius:8px;">
                         {% else %}
                             <img src="{{ url_for('static', filename='logo.png') }}" alt="placeholder" style="width:120px;height:120px;object-fit:contain;border-radius:8px;background:#f8fafc;padding:8px;">
                         {% endif %}
@@ -60,7 +63,7 @@
                     <h4 class="h5">Welcome{% if session.get('user_name') %}, {{ session.get('user_name') }}{% endif %}</h4>
                     <div class="text-muted small mb-2">GYS Youth Supporters Participant</div>
                     <div class="mb-2">
-                        Registration Status: 
+                        Registration Status:
                         {% if user and user.approved %}
                             <span class="badge bg-success">Approved</span>
                         {% else %}
@@ -71,7 +74,7 @@
                 </div>
 
                 <div class="flex-grow-1">
-                    <div class="card p-3 mb-3">
+                    <div class="section-card p-3 mb-3">
                         <h3 class="h6 mb-2">About GYS</h3>
                         <p class="mb-1">To support responsible civic participation and strengthen coordinated youth mobilization across campaign areas.</p>
                         <div class="row">
@@ -84,66 +87,35 @@
                                 <p class="small text-muted">Support civic participation and youth mobilization.</p>
                             </div>
                             <div class="col-md-4">
-                                <h6 class="mb-1">Aims</h6>
+                                <h6 class="mb-1">Aim</h6>
                                 <p class="small text-muted">Youth empowerment, community outreach, leadership development.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div id="activities" class="card p-3 mb-3">
-                        <h4 class="h6">Platform Activities</h4>
-                        <div class="row g-3 mt-2">
-                            <div class="col-sm-6 col-lg-4">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Technology Literacy Session</h5>
-                                        <p class="card-text small text-muted">Practical digital skills training for local youth.</p>
-                                        <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 col-lg-4">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Community Outreach</h5>
-                                        <p class="card-text small text-muted">Engaging local communities for civic education.</p>
-                                        <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
-                                    </div>
-                                </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6 col-xl-3">
+                            <div class="stat-card p-3 h-100">
+                                <div class="small text-muted">Total Activities</div>
+                                <div class="display-6 fw-bold">{{ total_activities }}</div>
                             </div>
                         </div>
-                    </div>
-
-                    <div id="media" class="card p-3 mb-3">
-                        <h4 class="h6">Activity Videos</h4>
-                        <p class="small text-muted">Video library of recorded sessions and events.</p>
-                    </div>
-
-                    <div id="gallery" class="card p-3 mb-3">
-                        <h4 class="h6">Community Gallery</h4>
-                        <div class="row g-2">
-                            <div class="col-6 col-md-4"><img src="{{ url_for('static', filename='images/gallery-1.jpg') }}" class="img-fluid rounded" alt="gallery"></div>
-                            <div class="col-6 col-md-4"><img src="{{ url_for('static', filename='images/gallery-2.jpg') }}" class="img-fluid rounded" alt="gallery"></div>
+                        <div class="col-md-6 col-xl-3">
+                            <div class="stat-card p-3 h-100">
+                                <div class="small text-muted">Media Items</div>
+                                <div class="display-6 fw-bold">{{ total_media }}</div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div id="submit" class="card p-3 mb-3">
-                        <h4 class="h6">Submit Your Work</h4>
-                        <p class="small text-muted">Share approved work for review by the Board.</p>
-                        <a href="#" class="btn btn-sm btn-outline-success">Submit New</a>
-                    </div>
-
-                    <div id="results" class="card p-3 mb-3">
-                        <h4 class="h6">Results & Reports</h4>
-                        <p class="small text-muted">Official results and reports published by the Board.</p>
-                    </div>
-
-                    <div id="leadership" class="card p-3 mb-3">
-                        <h4 class="h6">Executive Leadership Council</h4>
-                        <div class="row g-3 mt-2">
-                            <div class="col-6 col-md-4 text-center">
-                                <img src="{{ url_for('static', filename='logo.png') }}" alt="leader" style="width:84px;height:84px;object-fit:cover;border-radius:999px;">
-                                <div class="mt-2"><strong>Gaddafi Ibrahim Waziri</strong><div class="small text-muted">Co-founder / Chairman</div></div>
+                        <div class="col-md-6 col-xl-3">
+                            <div class="stat-card p-3 h-100">
+                                <div class="small text-muted">Community Posts</div>
+                                <div class="display-6 fw-bold">{{ total_community_posts }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-xl-3">
+                            <div class="stat-card p-3 h-100">
+                                <div class="small text-muted">Submitted Works</div>
+                                <div class="display-6 fw-bold">{{ total_submissions }}</div>
                             </div>
                         </div>
                     </div>
@@ -151,21 +123,192 @@
             </div>
         </section>
 
-        <section id="account" class="mb-4">
-            <div class="card p-3">
-                <h4 class="h6">My Account</h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        <ul class="list-unstyled">
-                            <li><strong>Full Name:</strong> {{ user.full_name if user else 'Unavailable' }}</li>
-                            <li><strong>Email:</strong> {{ user.email if user else 'Unavailable' }}</li>
-                            <li><strong>Username:</strong> {{ user.username if user else 'Unavailable' }}</li>
-                            <li><strong>Registration Status:</strong> {% if user and user.approved %}<span class="badge bg-success">Approved</span>{% else %}<span class="badge bg-warning text-dark">Pending</span>{% endif %}</li>
-                        </ul>
+        <section id="activities" class="section-card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h6 mb-0">Activities</h4>
+                <span class="badge badge-green">Live Program</span>
+            </div>
+            <div class="row g-3">
+                {% for activity in activities %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge badge-green">{{ activity.date }}</span>
+                                <span class="small text-muted">{{ activity.location }}</span>
+                            </div>
+                            <h5 class="card-title">{{ activity.title }}</h5>
+                            <p class="card-text small text-muted mb-0">{{ activity.description }}</p>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <p class="small text-muted">Your PVC number is protected for privacy and will not be displayed here.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="media" class="section-card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h6 mb-0">Media & Videos</h4>
+                <span class="badge badge-gold">Updated</span>
+            </div>
+            <div class="row g-3">
+                {% for media in media_items %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        {% if media.image_url %}
+                        <img src="{{ media.image_url }}" class="card-img-top" alt="{{ media.title }}" style="height:180px; object-fit:cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="small text-muted mb-1">{{ media.category }} · {{ media.date }}</div>
+                            <h5 class="card-title">{{ media.title }}</h5>
+                            <p class="card-text small text-muted mb-0">{{ media.caption }}</p>
+                        </div>
                     </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="gallery" class="section-card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h6 mb-0">Community Gallery</h4>
+                <span class="badge badge-green">Approved Photos</span>
+            </div>
+            <div class="row g-3">
+                {% for item in gallery_items %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="{{ item.image_url }}" class="card-img-top" alt="{{ item.title }}" style="height:200px; object-fit:cover;">
+                        <div class="card-body">
+                            <div class="small text-muted">{{ item.category }} · {{ item.date }}</div>
+                            <h5 class="card-title mt-2">{{ item.title }}</h5>
+                            <p class="card-text small text-muted mb-0">{{ item.caption }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="submit" class="section-card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="h6 mb-0">Submit Your Work</h4>
+                <span class="badge badge-gold">Participant Portal</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for work in submitted_works %}
+                        <tr>
+                            <td>{{ work.title }}</td>
+                            <td>{{ work.category }}</td>
+                            <td>
+                                {% if work.status == 'Approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif work.status == 'Rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% elif work.status == 'Reviewed' %}
+                                    <span class="badge bg-primary">Reviewed</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ work.description }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-muted">No submissions yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="results" class="section-card p-3 mb-4">
+            <h4 class="h6 mb-3">Results & Reports</h4>
+            <div class="row g-3">
+                {% for result in results %}
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary-subtle text-primary-emphasis">{{ result.category }}</span>
+                                <span class="small text-muted">{{ result.date }}</span>
+                            </div>
+                            <h5 class="card-title">{{ result.title }}</h5>
+                            <p class="card-text small text-muted mb-0">{{ result.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="leadership" class="section-card p-3 mb-4">
+            <h4 class="h6 mb-3">Executive Leadership Council</h4>
+            <div class="row g-3">
+                {% for person in leadership %}
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body d-flex gap-3 align-items-center">
+                            <img src="{{ person.photo_url }}" alt="{{ person.full_name }}" class="mini-avatar">
+                            <div>
+                                <h5 class="card-title mb-1">{{ person.full_name }}</h5>
+                                <div class="small text-success fw-semibold">{{ person.title }}</div>
+                                <p class="card-text small text-muted mb-0 mt-2">{{ person.biography }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="candidates" class="section-card p-3 mb-4">
+            <h4 class="h6 mb-3">Candidates</h4>
+            <div class="row g-3">
+                {% for candidate in candidates %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="fw-bold">{{ candidate.full_name }}</div>
+                            <div class="small text-muted mb-2">{{ candidate.party }} · {{ candidate.office }}</div>
+                            <div class="small text-secondary">Constituency: {{ candidate.constituency or 'Statewide' }}</div>
+                            <div class="small text-secondary">Election Year: {{ candidate.election_year or '2027' }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="account" class="section-card p-3 mb-4">
+            <h4 class="h6">My Account</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <ul class="list-unstyled mb-0">
+                        <li><strong>Full Name:</strong> {{ user.full_name if user else 'Unavailable' }}</li>
+                        <li><strong>Email:</strong> {{ user.email if user else 'Unavailable' }}</li>
+                        <li><strong>Username:</strong> {{ user.username if user else 'Unavailable' }}</li>
+                        <li><strong>Registration Status:</strong>
+                            {% if user and user.approved %}
+                                <span class="badge bg-success">Approved</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% endif %}
+                        </li>
+                        <li><strong>Member since:</strong> {% if user and user.created_at %}{{ user.created_at.strftime('%Y-%m-%d') }}{% else %}Unavailable{% endif %}</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <p class="small text-muted mb-0">PVC and voter identification numbers remain protected and are not displayed publicly in the participant profile.</p>
                 </div>
             </div>
         </section>

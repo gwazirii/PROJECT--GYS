@@ -16,6 +16,10 @@ dist-ssr
 .env
 .env.*
 *.db
+*.sqlite
+*.sqlite3
+cookies.txt
+instance/
 __pycache__/
 *.py[cod]
 .venv/

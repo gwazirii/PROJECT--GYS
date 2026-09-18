@@ -106,6 +106,91 @@ class LogEvent(db.Model):
     timestamp  = db.Column(db.DateTime,   default=datetime.utcnow)
 
 
+class Activity(db.Model):
+    id          = db.Column(db.Integer, primary_key=True)
+    title       = db.Column(db.String(180), nullable=False)
+    date        = db.Column(db.String(40), nullable=True)
+    location    = db.Column(db.String(120), nullable=True)
+    description = db.Column(db.Text, nullable=False)
+    photo_url   = db.Column(db.String(255), nullable=True)
+    video_url   = db.Column(db.String(255), nullable=True)
+    published   = db.Column(db.Boolean, default=True)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class MediaItem(db.Model):
+    id          = db.Column(db.Integer, primary_key=True)
+    title       = db.Column(db.String(180), nullable=False)
+    category    = db.Column(db.String(80), nullable=True)
+    caption     = db.Column(db.Text, nullable=True)
+    image_url   = db.Column(db.String(255), nullable=True)
+    video_url   = db.Column(db.String(255), nullable=True)
+    date        = db.Column(db.String(40), nullable=True)
+    published   = db.Column(db.Boolean, default=True)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class CommunityPhoto(db.Model):
+    id          = db.Column(db.Integer, primary_key=True)
+    title       = db.Column(db.String(180), nullable=False)
+    category    = db.Column(db.String(80), nullable=True)
+    caption     = db.Column(db.Text, nullable=True)
+    image_url   = db.Column(db.String(255), nullable=True)
+    date        = db.Column(db.String(40), nullable=True)
+    published   = db.Column(db.Boolean, default=True)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Submission(db.Model):
+    id          = db.Column(db.Integer, primary_key=True)
+    citizen_id  = db.Column(db.Integer, db.ForeignKey('citizen.id'), nullable=False)
+    title       = db.Column(db.String(180), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    category    = db.Column(db.String(80), nullable=True)
+    file_url    = db.Column(db.String(255), nullable=True)
+    status      = db.Column(db.String(30), default='Pending')
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+    citizen = db.relationship('Citizen', backref='submissions')
+
+
+class ResultReport(db.Model):
+    id          = db.Column(db.Integer, primary_key=True)
+    title       = db.Column(db.String(180), nullable=False)
+    category    = db.Column(db.String(80), nullable=True)
+    description = db.Column(db.Text, nullable=False)
+    date        = db.Column(db.String(40), nullable=True)
+    image_url   = db.Column(db.String(255), nullable=True)
+    document_url = db.Column(db.String(255), nullable=True)
+    status      = db.Column(db.String(30), default='Draft')
+    published   = db.Column(db.Boolean, default=False)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class LeadershipProfile(db.Model):
+    id          = db.Column(db.Integer, primary_key=True)
+    full_name   = db.Column(db.String(180), nullable=False)
+    title       = db.Column(db.String(180), nullable=False)
+    biography   = db.Column(db.Text, nullable=False)
+    photo_url   = db.Column(db.String(255), nullable=True)
+    contact     = db.Column(db.String(180), nullable=True)
+    published   = db.Column(db.Boolean, default=True)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class CandidateProfile(db.Model):
+    id            = db.Column(db.Integer, primary_key=True)
+    full_name     = db.Column(db.String(180), nullable=False)
+    party         = db.Column(db.String(120), nullable=True)
+    office        = db.Column(db.String(180), nullable=True)
+    constituency  = db.Column(db.String(180), nullable=True)
+    election_year = db.Column(db.String(20), nullable=True)
+    photo_url     = db.Column(db.String(255), nullable=True)
+    status        = db.Column(db.String(30), default='Draft')
+    published     = db.Column(db.Boolean, default=False)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 # ─────────────────────────────────────────────
 # 3.  Helpers
 # ─────────────────────────────────────────────
@@ -162,6 +247,168 @@ def _normalize_email(value: str) -> str:
 
 def _normalize_name(value: str) -> str:
     return re.sub(r'\s+', ' ', (value or '').strip())
+
+
+def _default_public_cards():
+    return {
+        'home': 'GYS Youth Supporters',
+        'about': 'To build a stronger youth civic movement rooted in participation, accountability, and service.',
+        'objectives': [
+            'Support youth civic participation and public awareness.',
+            'Strengthen community outreach and leadership development.',
+            'Facilitate transparent registration and verification.',
+            'Promote responsible and inclusive campaign engagement.'
+        ],
+        'aim': 'To empower young people with practical leadership, solidarity, and civic action across the campaign ecosystem.',
+        'vision': 'A united and informed youth movement driving purpose, integrity, and development.',
+        'mission': 'To mobilize, equip, and support youth volunteers with the tools, information, and networks needed for active participation.',
+        'work': [
+            'Community outreach and volunteer engagement',
+            'Leadership and civic education sessions',
+            'Campaign logistics and volunteer coordination',
+            'Media, results, and transparent reporting'
+        ],
+        'activities': [
+            {
+                'title': 'Youth Leadership Forum',
+                'date': '15 May 2026',
+                'location': 'Bauchi',
+                'description': 'A civic leadership session focused on community service, accountability, and youth participation.'
+            },
+            {
+                'title': 'Community Mobilization Drive',
+                'date': '22 June 2026',
+                'location': 'Yelwa',
+                'description': 'Volunteer outreach to strengthen civic awareness and grassroots participation.'
+            },
+            {
+                'title': 'Media & Digital Skills Session',
+                'date': '08 July 2026',
+                'location': 'GRA Hub',
+                'description': 'Training on digital storytelling, campaign communication, and effective youth engagement.'
+            }
+        ],
+        'media': [
+            {
+                'title': 'Volunteer Engagement Highlights',
+                'category': 'Campaign',
+                'caption': 'Snapshots from the local outreach program.',
+                'date': '26 May 2026'
+            },
+            {
+                'title': 'Digital Literacy Session',
+                'category': 'Training',
+                'caption': 'Participants learning practical digital communication tools.',
+                'date': '10 June 2026'
+            }
+        ],
+        'results': [
+            {
+                'title': 'Ward Outreach Summary',
+                'date': '01 August 2026',
+                'description': 'A verified community engagement report highlighting participation and outreach progress.',
+                'category': 'Report'
+            }
+        ],
+        'leadership': [
+            {
+                'name': 'Gaddafi Ibrahim Waziri',
+                'title': 'Co-founder / Chairman',
+                'bio': 'Leads strategy, public engagement, and youth development initiatives.',
+                'photo': 'gaddafi.jpg'
+            },
+            {
+                'name': 'Abdullahi Sadiq',
+                'title': 'Executive Member',
+                'bio': 'Supports grassroots mobilization and community relationship-building.',
+                'photo': 'abdullahi.jpg'
+            }
+        ],
+        'candidates': [
+            {
+                'name': 'Candidate Spotlight',
+                'party': 'GYS Platform',
+                'office': 'Youth Leadership Representative',
+                'constituency': 'Statewide',
+                'year': '2027'
+            }
+        ]
+    }
+
+
+def _default_dashboard_activity_items():
+    return [
+        {
+            'title': 'Youth Leadership Forum',
+            'date': '15 May 2026',
+            'location': 'Bauchi',
+            'description': 'A civic leadership discussion focused on service, accountability, and youth participation.'
+        },
+        {
+            'title': 'Community Mobilization Drive',
+            'date': '22 June 2026',
+            'location': 'Yelwa',
+            'description': 'Volunteer outreach aimed at strengthening local civic engagement and awareness.'
+        },
+        {
+            'title': 'Media & Digital Skills Session',
+            'date': '08 July 2026',
+            'location': 'GRA Hub',
+            'description': 'A practical training on storytelling, digital communication, and campaign visibility.'
+        }
+    ]
+
+
+def _default_media_items():
+    return [
+        {
+            'title': 'Volunteer Engagement Highlights',
+            'category': 'Campaign',
+            'caption': 'Highlights from the local outreach program.',
+            'date': '26 May 2026',
+            'image_url': '/static/images/abdullahi.jpg'
+        },
+        {
+            'title': 'Digital Literacy Session',
+            'category': 'Training',
+            'caption': 'Participants learning practical digital communication tools.',
+            'date': '10 June 2026',
+            'image_url': '/static/images/gaddafi.jpg'
+        }
+    ]
+
+
+def _default_gallery_items():
+    return [
+        {'title': 'Community Outreach', 'category': 'Outreach', 'caption': 'Grassroots engagement activity', 'date': '26 May 2026', 'image_url': '/static/images/abdullahi.jpg'},
+        {'title': 'Leadership Session', 'category': 'Leadership', 'caption': 'Youth leadership engagement', 'date': '21 June 2026', 'image_url': '/static/images/gaddafi.jpg'}
+    ]
+
+
+def _default_submissions():
+    return [
+        {'title': 'Volunteer Stories', 'status': 'Pending', 'category': 'Community', 'description': 'Short stories of citizen engagement and community work.'},
+        {'title': 'Outreach Photo Report', 'status': 'Reviewed', 'category': 'Media', 'description': 'Documentation of the latest community outreach drive.'}
+    ]
+
+
+def _default_results():
+    return [
+        {'title': 'Ward Outreach Summary', 'category': 'Report', 'status': 'Published', 'date': '01 August 2026', 'description': 'A community mobilization report completed and verified by the board.'}
+    ]
+
+
+def _default_leadership_members():
+    return [
+        {'full_name': 'Gaddafi Ibrahim Waziri', 'title': 'Co-founder / Chairman', 'biography': 'Strategic leader supporting youth participation and civic advancement.', 'photo_url': '/static/images/gaddafi.jpg'},
+        {'full_name': 'Abdullahi Sadiq', 'title': 'Executive Member', 'biography': 'Focused on grassroots engagement, member support, and community mobilization.', 'photo_url': '/static/images/abdullahi.jpg'}
+    ]
+
+
+def _default_candidates():
+    return [
+        {'full_name': 'Candidate Spotlight', 'party': 'GYS Platform', 'office': 'Youth Leadership Representative', 'constituency': 'Statewide', 'election_year': '2027'}
+    ]
 
 
 def _normalize_pvc_number(value: str) -> str:
@@ -258,6 +505,7 @@ def gate():
         'gate.html',
         section='gate',
         session=session,
+        public_cards=_default_public_cards(),
     )
 
 
@@ -547,11 +795,23 @@ def admin_dashboard():
         return redirect(url_for('admin_login'))
 
     citizens = Citizen.query.filter_by(reg_type='General').order_by(Citizen.created_at.desc(), Citizen.id.desc()).all()
+    activities = Activity.query.filter_by(published=True).all() or _default_dashboard_activity_items()
+    media_items = MediaItem.query.filter_by(published=True).all() or _default_media_items()
+    submissions = Submission.query.order_by(Submission.created_at.desc()).all()
+    results = ResultReport.query.filter_by(published=True).all() or _default_results()
+    leadership = LeadershipProfile.query.filter_by(published=True).all() or _default_leadership_members()
+    candidates = CandidateProfile.query.filter_by(published=True).all() or _default_candidates()
     return render_template(
         'admin_dashboard.html',
         section='admin_dashboard',
         session=session,
         citizens=citizens,
+        activities=activities,
+        media_items=media_items,
+        submissions=submissions,
+        results=results,
+        leadership=leadership,
+        candidates=candidates,
     )
 
 
@@ -566,10 +826,30 @@ def dashboard():
         user = None
         if session.get('user_id'):
             user = Citizen.query.get(session.get('user_id'))
+
+        activities = Activity.query.filter_by(published=True).all() or _default_dashboard_activity_items()
+        media_items = MediaItem.query.filter_by(published=True).all() or _default_media_items()
+        gallery_items = CommunityPhoto.query.filter_by(published=True).all() or _default_gallery_items()
+        submitted_works = Submission.query.filter_by(citizen_id=session.get('user_id')).order_by(Submission.created_at.desc()).all() or _default_submissions()
+        results = ResultReport.query.filter_by(published=True).all() or _default_results()
+        leadership = LeadershipProfile.query.filter_by(published=True).all() or _default_leadership_members()
+        candidates = CandidateProfile.query.filter_by(published=True).all() or _default_candidates()
+
         return render_template(
             'participant_dashboard.html',
             session=session,
             user=user,
+            activities=activities,
+            media_items=media_items,
+            gallery_items=gallery_items,
+            submitted_works=submitted_works,
+            results=results,
+            leadership=leadership,
+            candidates=candidates,
+            total_activities=len(activities),
+            total_media=len(media_items),
+            total_community_posts=len(gallery_items),
+            total_submissions=len(submitted_works),
         )
 
     # Default for unauthenticated: send to login
